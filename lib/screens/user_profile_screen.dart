@@ -1,8 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:okello_bill_tool/logic/bloc/auth_bloc.dart';
+import 'package:okello_bill_tool/logic/cubits/auth/auth_state.dart';
 
 import '../logic/cubits/auth/auth_cubit.dart';
 import 'source.dart';
+
+const defaultImage =
+    "https://media.istockphoto.com/photos/snowcapped-k2-peak-picture-id1288385045?k=20&m=1288385045&s=612x612&w=0&h=kcZXuKvLsEbbGakLlcZpolhBT7PyC9AQWiv2kZ7aHfQ=";
 
 class UserProfileScreen extends StatefulWidget {
   static String id = 'UserProfileScreen';
@@ -21,7 +26,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   final emailController = TextEditingController();
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
-  String? profilePic = '';
 
   void snackBar(String text) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
@@ -34,8 +38,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     emailController.text = user.email;
     nameController.text = user.name ?? "";
     phoneController.text = user.phone ?? "";
-    profilePic = user.profilePic ??
-        "https://media.istockphoto.com/photos/snowcapped-k2-peak-picture-id1288385045?k=20&m=1288385045&s=612x612&w=0&h=kcZXuKvLsEbbGakLlcZpolhBT7PyC9AQWiv2kZ7aHfQ=";
   }
 
   final picker = ImagePicker();
@@ -78,7 +80,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     GestureDetector(
                         onTap: () {
                           editEnabled = !editEnabled;
-                          print('editing is set to $editEnabled');
                           setState(() {});
                         },
                         child: !editEnabled
@@ -114,9 +115,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             backgroundColor: Colors.white,
                             radius:
                                 (MediaQuery.of(context).size.width / 5.5) - 4,
-                            backgroundImage:
-                                Image.network(profilePic!, fit: BoxFit.fill)
-                                    .image,
+                            backgroundImage: Image.network(
+                                    user.profilePic ?? defaultImage,
+                                    fit: BoxFit.fill)
+                                .image,
                             //   child: Image.network(profilePic, fit: BoxFit.fill),
                           ),
                         ),
@@ -169,7 +171,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                     child: TextField(
                                         controller: nameController,
                                         obscureText: false,
-                                        decoration: InputDecoration.collapsed(
+                                        decoration:
+                                            const InputDecoration.collapsed(
                                           hintText:
                                               'Enter your display name here',
                                         ),
@@ -307,63 +310,45 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   void _showAlertDialog(BuildContext context) {
-    final user = context.read<AuthCubit>().state.user;
-    // set up the buttons
-    Widget cancelButton = TextButton(
+    // show the dialog
+    showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+              content: const Text('Edit Profile Picture ?'),
+              actions: [
+                _buildCancelButton(),
+                _buildContinueButton(),
+              ],
+            ));
+  }
+
+  Widget _buildCancelButton() {
+    return TextButton(
         onPressed: () {
           Navigator.pop(context);
         },
         child: const Text('No', style: TextStyle(color: Colors.blue)));
-    Widget continueButton = TextButton(
-        onPressed: () async {
-          final XFile? image = await picker.pickImage(
-            source: ImageSource.gallery,
-          );
+  }
 
-          print('image = $image');
+  Widget _buildContinueButton() {
+    Future<void> uploadImage(String path) async {
+      await context.read<AuthCubit>().authUploadImage(path: path);
+    }
 
-          if (image == null) {
-            editEnabled = !editEnabled;
-            setState(() {});
+    return TextButton(
+      onPressed: () async {
+        final XFile? image = await picker.pickImage(
+          source: ImageSource.gallery,
+        );
 
-            print('image = null');
-            return;
-          } else if (image != null) {
-            //emit new state with updated user
-            // await context
-            //     .read<AuthCubit>()
-            //     .updateUserDetails(user.copyWith(profilePic: image.path));
-            print('this is the image path: ${image.path}');
-
-            String message = await context
-                .read<AuthCubit>()
-                .authUploadImage(filePathToUpload: image.path);
-            print('message = $message');
-
-            snackBar(message);
-
-            editEnabled = !editEnabled;
-
-            Navigator.pop(context);
-          }
-        },
-        child: const Text('Yes', style: TextStyle(color: Colors.blue)));
-
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      content: const Text('Edit Profile Picture ?'),
-      actions: [
-        cancelButton,
-        continueButton,
-      ],
-    );
-
-    // show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
+        if (image != null) await uploadImage(image.path);
+        editEnabled = !editEnabled;
+        setState(() {});
       },
+      child: const Text(
+        'Yes',
+        style: TextStyle(color: Colors.blue),
+      ),
     );
   }
 }

@@ -56,18 +56,13 @@ class AuthCubit extends Cubit<AuthState1> {
   Future<String> authSignIn(
       {required String email, required String password}) async {
     emit(AuthState1.loading(state.user));
-    print("loading");
     try {
       final user =
           await authMethods.signInWithEmail(email: email, password: password);
-      print("done");
       await Hive.box("users_box").put("user", user!.toJson());
-      print("done saving");
       emit(AuthState1.content(user));
-      print("no error");
       return "successfully signed in with email";
     } on FirebaseAuthException catch (e) {
-      print("error coming from Firebase: ${e.message ?? "unkown"}");
       emit(AuthState1.error(
           state.user,
           AuthError(
@@ -75,7 +70,6 @@ class AuthCubit extends Cubit<AuthState1> {
               dialogTitle: 'An Error Happened')));
       return e.message ?? "unknown error occurred";
     } catch (e) {
-      print("error coming from somewhere $e");
       emit(AuthState1.error(
           state.user,
           AuthError(
@@ -108,13 +102,9 @@ class AuthCubit extends Cubit<AuthState1> {
       final User? user = await authMethods.signInWithGoogle();
       await Hive.box("users_box").put("user", user!.toJson());
       final jsonUser = Hive.box("users_box").get("user");
-      print("JSON user from googleSignin After success: $jsonUser");
-      print("JSON user from googleSignin After success from json:)}");
-      inspect(state.user);
-      print(state.user);
-      print('about to emit state');
+      log("JSON user from googleSignin After success: $jsonUser");
+      log("JSON user from googleSignin After success from json:)}");
       emit(AuthState1.content(user));
-      print('state emitted');
       return 'successfully signed in with google';
     } catch (e) {
       emit(AuthState1.error(
@@ -191,7 +181,7 @@ class AuthCubit extends Cubit<AuthState1> {
   Future<String> authResetPassword({required email}) async {
     emit(AuthState1.loading(state.user));
     try {
-      var result = await authMethods.forgottenPassword(email: email);
+      await authMethods.forgottenPassword(email: email);
       emit(AuthState1.initial(User.empty()));
       return 'password reset link sent';
     } catch (e) {
@@ -203,23 +193,16 @@ class AuthCubit extends Cubit<AuthState1> {
     }
   }
 
-  Future<String> authUploadImage({required filePathToUpload}) async {
+  Future<void> authUploadImage({required String path}) async {
     final user = state.user;
 
     try {
-      if (user == null) {
-        emit(AuthState1.initial(User.empty()));
-        return 'user not signed in';
-      }
+      if (user.uid == null) throw 'user not signed in';
       // start the loading process
       emit(AuthState1.loading(state.user));
-
       // upload the file
-      final file = File(filePathToUpload);
-      final String newProfilePicURL = await uploadImage(
-        file: file,
-        userId: user.uid ?? '',
-      );
+      final newProfilePicURL =
+          await authMethods.uploadImage(path: path, userId: user.uid!);
       //
       // after upload is complete, grab the latest file references
       // final images = await _getImages(user.uid ?? '');
@@ -227,21 +210,12 @@ class AuthCubit extends Cubit<AuthState1> {
       // emit the new profile pic and turn off loading
       emit(AuthState1.userUpdated(
           state.user.copyWith(profilePic: newProfilePicURL)));
-
-      return 'completed successfully.';
     } catch (e) {
       emit(AuthState1.error(
           state.user,
           AuthError(
               dialogText: e.toString(), dialogTitle: 'An Error Happened')));
-      return e.toString();
     }
     // log user out if we don't have an actual user in app auth
   }
-
-  Future<Iterable<Reference>> _getImages(String userId) =>
-      FirebaseStorage.instance
-          .ref(userId)
-          .list()
-          .then((listResult) => listResult.items);
 }

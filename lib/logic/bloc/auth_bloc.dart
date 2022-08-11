@@ -434,10 +434,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
         // upload the file
         final file = File(event.filePathToUpload);
-        await uploadImage(
+     /*   await authMethods.uploadImage(
           file: file,
           userId: user.uid,
-        );
+        );*/
         // after upload is complete, grab the latest file references
         final images = await _getImages(user.uid);
         // emit the new images and turn off loading

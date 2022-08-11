@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:okello_bill_tool/models/user_model.dart';
 import 'package:twitter_login/twitter_login.dart';
+import 'package:uuid/uuid.dart';
 
 class AuthRepository {
   final _auth = auth.FirebaseAuth.instance;
@@ -37,7 +40,6 @@ class AuthRepository {
     await _auth.currentUser?.updateEmail(user.email);
     // await _auth.currentUser?.updatePassword(newPassword);
     // await _auth.currentUser?.updatePhoneNumber(user.phone);
-
 
     return null;
   }
@@ -100,7 +102,7 @@ class AuthRepository {
   Future<User?> signInWithEmail(
       {required String email, required String password}) async {
     final firebaseUser = (await _auth.signInWithEmailAndPassword(
-        email: email, password: password))
+            email: email, password: password))
         .user;
     return User(
         email: email,
@@ -124,10 +126,10 @@ class AuthRepository {
             name: firebaseUser.displayName);
       } else {
         final GoogleSignInAccount? googleSignInAccount =
-        await googleSignIn.signIn();
+            await googleSignIn.signIn();
 
         final GoogleSignInAuthentication googleSignInAuthentication =
-        await googleSignInAccount!.authentication;
+            await googleSignInAccount!.authentication;
 
         final credential = auth.GoogleAuthProvider.credential(
           accessToken: googleSignInAuthentication.accessToken,
@@ -153,7 +155,7 @@ class AuthRepository {
       final LoginResult loginResult = await FacebookAuth.instance.login();
 
       final credential =
-      auth.FacebookAuthProvider.credential(loginResult.accessToken!.token);
+          auth.FacebookAuthProvider.credential(loginResult.accessToken!.token);
 
       final firebaseUser = (await _auth.signInWithCredential(credential)).user;
       final facebookUser = await FacebookAuth.instance.getUserData();
@@ -240,5 +242,17 @@ class AuthRepository {
     } on auth.FirebaseAuthException {
       rethrow;
     }
+  }
+
+  Future<String> uploadImage(
+      {required String path, required String? userId}) async {
+    final path = '$userId/${const Uuid().v4()}';
+
+    final ref = FirebaseStorage.instance.ref().child(path);
+    var uploadTask = ref.putFile(File(path));
+    final snapshot = await uploadTask.whenComplete(() => {});
+    final urlDownload = await snapshot.ref.getDownloadURL();
+
+    return urlDownload;
   }
 }
