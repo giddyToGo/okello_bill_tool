@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "186621583380",
+    "project_id": "okello-billtool",
+    "storage_bucket": "okello-billtool.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:186621583380:android:f8c95fcda78d73b7db8701",
+        "android_client_info": {
+          "package_name": "com.example.okello_bill_tool"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "186621583380-4mkbdgr0ae7s1a5v64a2p2e80j84d2ha.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.okello_bill_tool",
+            "certificate_hash": "a56045627b1c0515ae3457092786a0cabfedcea7"
+          }
+        },
+        {
+          "client_id": "186621583380-k78a3ae11vmd7kiigcb0smnq3q6947j5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAW00HCxXv0THYx771g-kqhSBpsm8Q_B8s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "186621583380-k78a3ae11vmd7kiigcb0smnq3q6947j5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "186621583380-nf66a17t006o53n9fmod5lknl5lnejg1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.okelloBillTool"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
