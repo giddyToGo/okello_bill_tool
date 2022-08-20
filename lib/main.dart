@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:hive/hive.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:okello_bill_tool/dialogs/auth_error.dart';
 import 'package:okello_bill_tool/firebase_options.dart';
 import 'package:okello_bill_tool/logic/cubits/auth/auth_state.dart';
 import 'package:okello_bill_tool/logic/cubits/internet/internet_cubit.dart';
@@ -38,8 +39,7 @@ void main() async {
       providers: [
         BlocProvider(create: (_) => AuthCubit()),
         BlocProvider(
-            create: (context) =>
-                InternetCubit(
+            create: (context) => InternetCubit(
                   connectivity: Connectivity(),
                 )),
       ],
@@ -51,7 +51,7 @@ void main() async {
 }
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
-GlobalKey<ScaffoldMessengerState>();
+    GlobalKey<ScaffoldMessengerState>();
 
 class MyApp extends StatelessWidget {
   final Connectivity connectivity;
@@ -63,86 +63,88 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GlobalLoaderOverlay(
         child: MaterialApp(
-          scaffoldMessengerKey: scaffoldMessengerKey,
-          title: 'Okello BillsTool',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
-          debugShowCheckedModeBanner: false,
-          routes: {
-            HomeScreen.id: (_) => const HomeScreen(),
-            SignUpPage.id: (_) => const SignUpPage(),
-            SignUpScreen.id: (_) => const SignUpScreen(),
-            SignInScreen.id: (_) => const SignInScreen(),
-            UserProfileScreen.id: (_) => const UserProfileScreen(),
-            UserSettingsScreen.id: (_) => const UserSettingsScreen(),
-            ForgotPasswordScreen.id: (_) => const ForgotPasswordScreen(),
+      scaffoldMessengerKey: scaffoldMessengerKey,
+      title: 'Okello BillsTool',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      debugShowCheckedModeBanner: false,
+      routes: {
+        HomeScreen.id: (_) => const HomeScreen(),
+        SignUpPage.id: (_) => const SignUpPage(),
+        SignUpScreen.id: (_) => const SignUpScreen(),
+        SignInScreen.id: (_) => const SignInScreen(),
+        UserProfileScreen.id: (_) => const UserProfileScreen(),
+        UserSettingsScreen.id: (_) => const UserSettingsScreen(),
+        ForgotPasswordScreen.id: (_) => const ForgotPasswordScreen(),
+      },
+      home: BlocListener<AuthCubit, AuthState1>(
+          listener: (context, state) {
+            state.maybeWhen(loading: (__, _, message) {
+              LoadingScreen.instance().show(
+                context: context,
+                text: message ?? 'Loading... ',
+              );
+            }, error: (_, authError) {
+              if (authError is AuthErrorNoInternet) {
+                context.read<InternetCubit>().emitInternetDisconnected();
+                return;
+              }
+              LoadingScreen.instance().hide();
+              showAuthError(
+                authError: authError,
+                context: context,
+              );
+            }, content: (_, __, message) {
+              LoadingScreen.instance().hide();
+              message != null
+                  ? ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(message.toString())))
+                  : null;
+              Navigator.pushNamed(context, HomeScreen.id);
+            }, initial: (user, __, message) {
+              LoadingScreen.instance().hide();
+              bool signedIn = user.signedIn ?? false;
+              !signedIn ? Navigator.pushNamed(context, SignInScreen.id) : null;
+              message != null
+                  ? ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(message.toString())))
+                  : null;
+            }, success: (_, __, message) {
+              LoadingScreen.instance().hide();
+              message != null
+                  ? ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(message.toString())))
+                  : null;
+            }, orElse: () {
+              LoadingScreen.instance().hide();
+            });
           },
-          home: BlocListener<AuthCubit, AuthState1>(
+          child: BlocConsumer<InternetCubit, InternetState>(
               listener: (context, state) {
-                state.maybeWhen(loading: (__, _, message) {
-                  LoadingScreen.instance().show(
-                    context: context,
-                    text: message ?? 'Loading... ',
-                  );
-                },
-                    error: (_, authError) {
-                      if (authError == "Intenret ") {
-
-                      }
-                      LoadingScreen.instance().hide();
-                      showAuthError(
-                        authError: authError,
-                        context: context,
-                      );
-                    },
-                    content: (_, __, message) {
-                      LoadingScreen.instance().hide();
-                      message != null
-                          ? ScaffoldMessenger.of(context)
-                          .showSnackBar(
-                          SnackBar(content: Text(message.toString())))
-                          : null;
-                      Navigator.pushNamed(context, HomeScreen.id);
-                    },
-                    initial: (user, __, message) {
-                      LoadingScreen.instance().hide();
-                      bool signedIn = user.signedIn ?? false;
-                      !signedIn
-                          ? Navigator.pushNamed(context, SignInScreen.id)
-                          : null;
-                      message != null
-                          ? ScaffoldMessenger.of(context)
-                          .showSnackBar(
-                          SnackBar(content: Text(message.toString())))
-                          : null;
-                    },
-                    success: (_, __, message) {
-                      LoadingScreen.instance().hide();
-                      message != null
-                          ? ScaffoldMessenger.of(context)
-                          .showSnackBar(
-                          SnackBar(content: Text(message.toString())))
-                          : null;
-                    },
-                    orElse: () {
-                      LoadingScreen.instance().hide();
-                    });
-              },
-              child: BlocListener<InternetCubit, InternetState>(
-                listener: (context, state) {
-                  if (state is InternetDisconnected) {
-                    LoadingScreen.instance().show(
-                      context: context,
-                      text: 'Internet is down, please reconnect',
-                    );
-                  } else if (state is InternetConnected) {
-                    LoadingScreen.instance().hide();
-                  }
-                },
-                child: const SplashScreen(),
-              )),
-        ));
+            if (state is InternetDisconnected) {
+              /*   LoadingScreen.instance().show(
+                context: context,
+                text: 'Internet is down, please reconnect',
+              );*/
+            } else if (state is InternetConnected) {
+              LoadingScreen.instance().hide();
+            }
+          }, builder: (context, state) {
+            return Scaffold(
+                body: Column(
+              children: [
+                if (state is InternetDisconnected)
+                  Container(
+                    color: Colors.red,
+                    height: 100,
+                    child: const Text("Please connect !!!"),
+                  ),
+                const SplashScreen(),
+              ],
+            ));
+          })),
+    ));
   }
 }
 
