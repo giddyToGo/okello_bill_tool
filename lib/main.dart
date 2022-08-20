@@ -1,11 +1,12 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:hive/hive.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:okello_bill_tool/firebase_options.dart';
-import 'package:okello_bill_tool/logic/bloc/auth_bloc.dart';
 import 'package:okello_bill_tool/logic/cubits/auth/auth_state.dart';
+import 'package:okello_bill_tool/logic/cubits/internet/internet_cubit.dart';
 import 'package:okello_bill_tool/screens/forgotPassword_screen.dart';
 import 'package:okello_bill_tool/screens/home_screen.dart';
 import 'package:okello_bill_tool/screens/loading_screen.dart';
@@ -18,6 +19,7 @@ import 'package:path_provider/path_provider.dart' as path_provider;
 
 import 'dialogs/show_auth_error.dart';
 import 'logic/cubits/auth/auth_cubit.dart';
+import 'models/user_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,27 +34,35 @@ void main() async {
         appId: "1184501812387266", cookie: true, xfbml: true, version: "v13.0");
   }
 
-  final app = MultiBlocProvider(providers: [
-    BlocProvider(create: (_) => AuthCubit()),
-    BlocProvider(create: (_) => AuthBloc()..add(const AppEventInitialize()))
-  ], child: const MyApp());
+  final app = MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => AuthCubit()),
+        BlocProvider(
+            create: (context) =>
+                InternetCubit(
+                  connectivity: Connectivity(),
+                )),
+      ],
+      child: MyApp(
+        connectivity: Connectivity(),
+      ));
 
   runApp(app);
 }
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
-    GlobalKey<ScaffoldMessengerState>();
-
-///  <----------------Issue trying to get this to work so my snack bars show across navigation
+GlobalKey<ScaffoldMessengerState>();
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  final Connectivity connectivity;
+
+  const MyApp({Key? key, required this.connectivity}) : super(key: key);
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return GlobalLoaderOverlay(
-      child: MaterialApp(
+        child: MaterialApp(
           scaffoldMessengerKey: scaffoldMessengerKey,
           title: 'Okello BillsTool',
           theme: ThemeData(
@@ -69,33 +79,70 @@ class MyApp extends StatelessWidget {
             ForgotPasswordScreen.id: (_) => const ForgotPasswordScreen(),
           },
           home: BlocListener<AuthCubit, AuthState1>(
-            listener: (context, state) {
-              state.maybeWhen(loading: (__, _) {
-                LoadingScreen.instance().show(
-                  context: context,
-                  text: 'Loading... ',
-                );
-              }, error: (_, authError) {
-                LoadingScreen.instance().hide();
-                showAuthError(
-                  authError: authError,
-                  context: context,
-                );
-              }, content: (_, __) {
-                LoadingScreen.instance().hide();
-                Navigator.pushNamed(context, HomeScreen.id);
-              }, initial: (_, __) {
-                LoadingScreen.instance().hide();
-                Navigator.pushNamed(context, SignInScreen.id);
-              }, userUpdated: (_, __) {
-                LoadingScreen.instance().hide();
-              }, orElse: () {
-                LoadingScreen.instance().hide();
-              });
-            },
-            child: const SplashScreen(),
-          )),
-    );
+              listener: (context, state) {
+                state.maybeWhen(loading: (__, _, message) {
+                  LoadingScreen.instance().show(
+                    context: context,
+                    text: message ?? 'Loading... ',
+                  );
+                },
+                    error: (_, authError) {
+                      if (authError == "Intenret ") {
+
+                      }
+                      LoadingScreen.instance().hide();
+                      showAuthError(
+                        authError: authError,
+                        context: context,
+                      );
+                    },
+                    content: (_, __, message) {
+                      LoadingScreen.instance().hide();
+                      message != null
+                          ? ScaffoldMessenger.of(context)
+                          .showSnackBar(
+                          SnackBar(content: Text(message.toString())))
+                          : null;
+                      Navigator.pushNamed(context, HomeScreen.id);
+                    },
+                    initial: (user, __, message) {
+                      LoadingScreen.instance().hide();
+                      bool signedIn = user.signedIn ?? false;
+                      !signedIn
+                          ? Navigator.pushNamed(context, SignInScreen.id)
+                          : null;
+                      message != null
+                          ? ScaffoldMessenger.of(context)
+                          .showSnackBar(
+                          SnackBar(content: Text(message.toString())))
+                          : null;
+                    },
+                    success: (_, __, message) {
+                      LoadingScreen.instance().hide();
+                      message != null
+                          ? ScaffoldMessenger.of(context)
+                          .showSnackBar(
+                          SnackBar(content: Text(message.toString())))
+                          : null;
+                    },
+                    orElse: () {
+                      LoadingScreen.instance().hide();
+                    });
+              },
+              child: BlocListener<InternetCubit, InternetState>(
+                listener: (context, state) {
+                  if (state is InternetDisconnected) {
+                    LoadingScreen.instance().show(
+                      context: context,
+                      text: 'Internet is down, please reconnect',
+                    );
+                  } else if (state is InternetConnected) {
+                    LoadingScreen.instance().hide();
+                  }
+                },
+                child: const SplashScreen(),
+              )),
+        ));
   }
 }
 
@@ -112,18 +159,18 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // checkIfUserIsInLocalStorage checks for a user in local storage and emits content state if so. if not, emits initial state.
-    // context.read<AuthCubit>().checkIfUserExistsInLocalStorage();
-    // isSignedIn = context.read<AuthCubit>().state.user.email.isNotEmpty;
 
-    isSignedIn = context
-        .read<AuthCubit>()
-        .state
-        .maybeWhen(content: (_, __) => true, orElse: () => false);
+    final jsonUser = Hive.box("users_box").get("user");
+    context.read<AuthCubit>().initialiseFromLocalStorage();
+    User user = User.fromJson(jsonUser);
+    isSignedIn = user.signedIn ?? false;
   }
 
   @override
   Widget build(BuildContext context) {
+    // bool state = context.read<AuthCubit>().checkForExistingUserInLocalStorage();
+    // bool? isSignedIn = context.read<AuthCubit>().state.user.signedIn ?? false;
+
     return isSignedIn ? const HomeScreen() : const SignInScreen();
   }
 }

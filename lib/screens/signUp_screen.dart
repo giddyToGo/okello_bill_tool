@@ -183,10 +183,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     children: <Widget>[
                       GestureDetector(
                         onTap: () async {
-                          String message = await context
+                          await context
                               .read<AuthCubit>()
                               .authSignInWithGoogle();
-                          snackBar(message);
                         },
                         child: Container(
                           padding: const EdgeInsets.all(8),
@@ -212,10 +211,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       GestureDetector(
                         onTap: () async {
-                          String message = await context
+                          await context
                               .read<AuthCubit>()
                               .authSignInWithFacebook();
-                          snackBar(message);
                         },
                         child: const Image(
                             image: AssetImage('assets/images/facebook.png'),
@@ -224,10 +222,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       GestureDetector(
                         onTap: () async {
-                          String message = await context
+                          await context
                               .read<AuthCubit>()
                               .authSignInWithTwitter();
-                          snackBar(message);
                         },
                         child: const Image(
                             image: AssetImage('assets/images/twitter.png'),

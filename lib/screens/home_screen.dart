@@ -1,7 +1,5 @@
-import 'package:okello_bill_tool/logic/bloc/auth_bloc.dart';
 import 'package:okello_bill_tool/screens/user_profile_screen.dart';
 
-import '../logic/bloc/auth_bloc.dart';
 import '../logic/cubits/auth/auth_cubit.dart';
 import '../logic/cubits/auth/auth_state.dart';
 import 'source.dart';
@@ -37,18 +35,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var state = context.read<AuthCubit>().state;
+
     final user = context.watch<AuthCubit>().state.user;
-
     final profilePic = user.profilePic;
-
-    // final picker = useMemoized(() => ImagePicker(), [key]);
-    final images = context.watch<AuthBloc>().state.images ?? [];
 
     return Scaffold(
       body: BlocListener<AuthCubit, AuthState1>(
         listener: (context, state) {
-          final isSuccess =
-              state.maybeWhen(content: (_, error) => true, orElse: () => false);
+          final isSuccess = state.maybeWhen(
+              content: (_, error, message) => true, orElse: () => false);
           if (isSuccess) Navigator.pushNamed(context, HomeScreen.id);
         },
         child: ListView(children: <Widget>[
@@ -57,8 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: GestureDetector(
               behavior: HitTestBehavior.translucent,
               onTap: () async {
-                String message = await context.read<AuthCubit>().authSignOut();
-                snackBar(message);
+                await context.read<AuthCubit>().authSignOut(state.user);
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -142,10 +137,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   )),
                 ),
                 onPressed: () async {
-                  String message = await context
+                  await context
                       .read<AuthCubit>()
-                      .checkForExistingUser(email: email);
-                  snackBar(message);
+                      .checkForExistingUserInFirebase(email: email);
                 },
                 child: const Padding(
                   padding: EdgeInsets.symmetric(vertical: 5),

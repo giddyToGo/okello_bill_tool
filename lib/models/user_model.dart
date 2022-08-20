@@ -6,29 +6,37 @@ class User {
   final String email;
   String? phone, name, profilePic, uid;
   final SignUpOption signUpOption;
+  final bool? signedIn;
 
-  User(
-      {required this.email,
-      this.uid,
-      this.name,
-      this.phone,
-      this.profilePic,
-      this.signUpOption = SignUpOption.emailPassword});
+  User({
+    required this.email,
+    required this.uid,
+    this.name,
+    this.phone,
+    this.profilePic,
+    this.signUpOption = SignUpOption.emailPassword,
+    this.signedIn,
+  });
 
-  User.empty() : this(email: "");
+  User.empty() : this(email: "", uid: "");
 
-  User copyWith(
-      {String? name,
-      String? email,
-      String? phone,
-      String? profilePic,
-      signUpOption}) {
+  User copyWith({
+    String? name,
+    String? email,
+    String? phone,
+    String? profilePic,
+    bool? signedIn,
+    signUpOption,
+  }) {
     return User(
-        name: name ?? this.name,
-        email: email ?? this.email,
-        phone: phone ?? this.phone,
-        profilePic: profilePic ?? this.profilePic,
-        signUpOption: signUpOption ?? this.signUpOption);
+      name: name ?? this.name,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
+      profilePic: profilePic ?? this.profilePic,
+      signUpOption: signUpOption ?? this.signUpOption,
+      signedIn: signedIn ?? this.signedIn,
+      uid: uid,
+    );
   }
 
   // changeImageUrl({required String imageUrl}) {
@@ -40,7 +48,9 @@ class User {
         phone = "",
         signUpOption = SignUpOption.google,
         name = "",
-        profilePic = "";
+        profilePic = "",
+        uid = "",
+        signedIn = true;
 
   String toJson() {
     final userMap = {
@@ -48,7 +58,9 @@ class User {
       "email": email,
       "phone": phone,
       "imageURL": profilePic,
-      "signUpOption": signUpOption.name
+      "signUpOption": signUpOption.name,
+      "uid": uid,
+      "signedIn": signedIn,
     };
     return jsonEncode(userMap);
   }
@@ -56,16 +68,23 @@ class User {
   factory User.fromJson(String userJson) {
     final decoded = jsonDecode(userJson) as Map<String, dynamic>;
     return User(
-      email: decoded["email"] ?? "email address",
-      phone: decoded["phone"],
-      profilePic: decoded["imageURL"],
-      name: decoded["name"],
-      signUpOption: convertToSignUpOption(decoded["signUpOption"]),
-    );
+        email: decoded["email"] ?? "email address",
+        phone: decoded["phone"],
+        profilePic: decoded["imageURL"],
+        name: decoded["name"],
+        signUpOption: convertToSignUpOption(decoded["signUpOption"],
+            uid: decoded["uid"] ?? "User.fromJson failed to grab uid"),
+        uid: decoded["uid"] ?? "User.fromJson failed to grab uid",
+        signedIn: decoded["signedIn"]);
+  }
+
+  User signOut() {
+    User signedOutUser = copyWith(signedIn: false);
+    return signedOutUser;
   }
 }
 
-SignUpOption convertToSignUpOption(String option) {
+SignUpOption convertToSignUpOption(String option, {required uid}) {
   if (option == SignUpOption.emailPassword.name) {
     return SignUpOption.emailPassword;
   } else if (option == SignUpOption.google.name) {

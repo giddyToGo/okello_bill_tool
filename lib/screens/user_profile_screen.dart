@@ -1,7 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:okello_bill_tool/logic/bloc/auth_bloc.dart';
-import 'package:okello_bill_tool/logic/cubits/auth/auth_state.dart';
 
 import '../logic/cubits/auth/auth_cubit.dart';
 import 'source.dart';
@@ -337,6 +335,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
     return TextButton(
       onPressed: () async {
+        Navigator.pop(context);
         final XFile? image = await picker.pickImage(
           source: ImageSource.gallery,
         );

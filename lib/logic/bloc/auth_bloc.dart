@@ -7,7 +7,6 @@ import 'package:flutter/foundation.dart' show immutable, kIsWeb;
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:okello_bill_tool/dialogs/auth_error.dart';
-import 'package:okello_bill_tool/utils/upload_image.dart';
 import 'package:twitter_login/twitter_login.dart';
 
 part 'auth_event.dart';
@@ -150,10 +149,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             final String accessToken = credential.accessToken!;
             final images = await _getImages(firebaseUser.uid);
             final String photoUrl = facebookUserData["picture"]["data"]["url"];
-            print(
-                "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ PHOTO URL: $photoUrl");
-            print("Facebook User Data: $facebookUserData");
-            print("Firebase user data: $firebaseUser");
+
             final String displayName = facebookUserData["name"];
             final String email = facebookUserData["email"];
             final phoneNumber = firebaseUser.phoneNumber;
@@ -169,7 +165,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
                 phoneNumber: phoneNumber ?? '',
               ),
             );
-            print('After App State call, this is photoURL:  $photoUrl');
           }
         } on auth.FirebaseAuthException catch (e) {
           emit(
@@ -434,7 +429,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
         // upload the file
         final file = File(event.filePathToUpload);
-     /*   await authMethods.uploadImage(
+        /*   await authMethods.uploadImage(
           file: file,
           userId: user.uid,
         );*/

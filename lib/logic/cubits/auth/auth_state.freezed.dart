@@ -19,57 +19,61 @@ mixin _$AuthState1 {
   User get user => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(User user, AuthError? authError) loading,
-    required TResult Function(User user, AuthError? authError) content,
+    required TResult Function(User user, AuthError? authError, String? message)
+        loading,
     required TResult Function(User user, AuthError authError) error,
-    required TResult Function(User user, AuthError? authError) initial,
-    required TResult Function(User user, AuthError? authError) userUpdated,
+    required TResult Function(User user, AuthError? authError, String? message)
+        initial,
+    required TResult Function(User user, AuthError? authError, String? message)
+        content,
+    required TResult Function(User user, AuthError? authError, String? message)
+        success,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(User user, AuthError? authError)? loading,
-    TResult Function(User user, AuthError? authError)? content,
+    TResult Function(User user, AuthError? authError, String? message)? loading,
     TResult Function(User user, AuthError authError)? error,
-    TResult Function(User user, AuthError? authError)? initial,
-    TResult Function(User user, AuthError? authError)? userUpdated,
+    TResult Function(User user, AuthError? authError, String? message)? initial,
+    TResult Function(User user, AuthError? authError, String? message)? content,
+    TResult Function(User user, AuthError? authError, String? message)? success,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(User user, AuthError? authError)? loading,
-    TResult Function(User user, AuthError? authError)? content,
+    TResult Function(User user, AuthError? authError, String? message)? loading,
     TResult Function(User user, AuthError authError)? error,
-    TResult Function(User user, AuthError? authError)? initial,
-    TResult Function(User user, AuthError? authError)? userUpdated,
+    TResult Function(User user, AuthError? authError, String? message)? initial,
+    TResult Function(User user, AuthError? authError, String? message)? content,
+    TResult Function(User user, AuthError? authError, String? message)? success,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Loading value) loading,
-    required TResult Function(_Content value) content,
     required TResult Function(_Error value) error,
     required TResult Function(_Initial value) initial,
-    required TResult Function(_UserUpdated value) userUpdated,
+    required TResult Function(_Content value) content,
+    required TResult Function(_Success value) success,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult Function(_Loading value)? loading,
-    TResult Function(_Content value)? content,
     TResult Function(_Error value)? error,
     TResult Function(_Initial value)? initial,
-    TResult Function(_UserUpdated value)? userUpdated,
+    TResult Function(_Content value)? content,
+    TResult Function(_Success value)? success,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Loading value)? loading,
-    TResult Function(_Content value)? content,
     TResult Function(_Error value)? error,
     TResult Function(_Initial value)? initial,
-    TResult Function(_UserUpdated value)? userUpdated,
+    TResult Function(_Content value)? content,
+    TResult Function(_Success value)? success,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -114,7 +118,7 @@ abstract class _$$_LoadingCopyWith<$Res> implements $AuthState1CopyWith<$Res> {
           _$_Loading value, $Res Function(_$_Loading) then) =
       __$$_LoadingCopyWithImpl<$Res>;
   @override
-  $Res call({User user, AuthError? authError});
+  $Res call({User user, AuthError? authError, String? message});
 }
 
 /// @nodoc
@@ -130,6 +134,7 @@ class __$$_LoadingCopyWithImpl<$Res> extends _$AuthState1CopyWithImpl<$Res>
   $Res call({
     Object? user = freezed,
     Object? authError = freezed,
+    Object? message = freezed,
   }) {
     return _then(_$_Loading(
       user == freezed
@@ -140,6 +145,10 @@ class __$$_LoadingCopyWithImpl<$Res> extends _$AuthState1CopyWithImpl<$Res>
           ? _value.authError
           : authError // ignore: cast_nullable_to_non_nullable
               as AuthError?,
+      message == freezed
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -147,16 +156,18 @@ class __$$_LoadingCopyWithImpl<$Res> extends _$AuthState1CopyWithImpl<$Res>
 /// @nodoc
 
 class _$_Loading implements _Loading {
-  const _$_Loading(this.user, [this.authError]);
+  const _$_Loading(this.user, [this.authError, this.message]);
 
   @override
   final User user;
   @override
   final AuthError? authError;
+  @override
+  final String? message;
 
   @override
   String toString() {
-    return 'AuthState1.loading(user: $user, authError: $authError)';
+    return 'AuthState1.loading(user: $user, authError: $authError, message: $message)';
   }
 
   @override
@@ -165,14 +176,16 @@ class _$_Loading implements _Loading {
         (other.runtimeType == runtimeType &&
             other is _$_Loading &&
             const DeepCollectionEquality().equals(other.user, user) &&
-            const DeepCollectionEquality().equals(other.authError, authError));
+            const DeepCollectionEquality().equals(other.authError, authError) &&
+            const DeepCollectionEquality().equals(other.message, message));
   }
 
   @override
   int get hashCode => Object.hash(
       runtimeType,
       const DeepCollectionEquality().hash(user),
-      const DeepCollectionEquality().hash(authError));
+      const DeepCollectionEquality().hash(authError),
+      const DeepCollectionEquality().hash(message));
 
   @JsonKey(ignore: true)
   @override
@@ -182,39 +195,43 @@ class _$_Loading implements _Loading {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(User user, AuthError? authError) loading,
-    required TResult Function(User user, AuthError? authError) content,
+    required TResult Function(User user, AuthError? authError, String? message)
+        loading,
     required TResult Function(User user, AuthError authError) error,
-    required TResult Function(User user, AuthError? authError) initial,
-    required TResult Function(User user, AuthError? authError) userUpdated,
+    required TResult Function(User user, AuthError? authError, String? message)
+        initial,
+    required TResult Function(User user, AuthError? authError, String? message)
+        content,
+    required TResult Function(User user, AuthError? authError, String? message)
+        success,
   }) {
-    return loading(user, authError);
+    return loading(user, authError, message);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(User user, AuthError? authError)? loading,
-    TResult Function(User user, AuthError? authError)? content,
+    TResult Function(User user, AuthError? authError, String? message)? loading,
     TResult Function(User user, AuthError authError)? error,
-    TResult Function(User user, AuthError? authError)? initial,
-    TResult Function(User user, AuthError? authError)? userUpdated,
+    TResult Function(User user, AuthError? authError, String? message)? initial,
+    TResult Function(User user, AuthError? authError, String? message)? content,
+    TResult Function(User user, AuthError? authError, String? message)? success,
   }) {
-    return loading?.call(user, authError);
+    return loading?.call(user, authError, message);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(User user, AuthError? authError)? loading,
-    TResult Function(User user, AuthError? authError)? content,
+    TResult Function(User user, AuthError? authError, String? message)? loading,
     TResult Function(User user, AuthError authError)? error,
-    TResult Function(User user, AuthError? authError)? initial,
-    TResult Function(User user, AuthError? authError)? userUpdated,
+    TResult Function(User user, AuthError? authError, String? message)? initial,
+    TResult Function(User user, AuthError? authError, String? message)? content,
+    TResult Function(User user, AuthError? authError, String? message)? success,
     required TResult orElse(),
   }) {
     if (loading != null) {
-      return loading(user, authError);
+      return loading(user, authError, message);
     }
     return orElse();
   }
@@ -223,10 +240,10 @@ class _$_Loading implements _Loading {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Loading value) loading,
-    required TResult Function(_Content value) content,
     required TResult Function(_Error value) error,
     required TResult Function(_Initial value) initial,
-    required TResult Function(_UserUpdated value) userUpdated,
+    required TResult Function(_Content value) content,
+    required TResult Function(_Success value) success,
   }) {
     return loading(this);
   }
@@ -235,10 +252,10 @@ class _$_Loading implements _Loading {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult Function(_Loading value)? loading,
-    TResult Function(_Content value)? content,
     TResult Function(_Error value)? error,
     TResult Function(_Initial value)? initial,
-    TResult Function(_UserUpdated value)? userUpdated,
+    TResult Function(_Content value)? content,
+    TResult Function(_Success value)? success,
   }) {
     return loading?.call(this);
   }
@@ -247,10 +264,10 @@ class _$_Loading implements _Loading {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Loading value)? loading,
-    TResult Function(_Content value)? content,
     TResult Function(_Error value)? error,
     TResult Function(_Initial value)? initial,
-    TResult Function(_UserUpdated value)? userUpdated,
+    TResult Function(_Content value)? content,
+    TResult Function(_Success value)? success,
     required TResult orElse(),
   }) {
     if (loading != null) {
@@ -261,180 +278,16 @@ class _$_Loading implements _Loading {
 }
 
 abstract class _Loading implements AuthState1 {
-  const factory _Loading(final User user, [final AuthError? authError]) =
-      _$_Loading;
+  const factory _Loading(final User user,
+      [final AuthError? authError, final String? message]) = _$_Loading;
 
   @override
   User get user;
   AuthError? get authError;
+  String? get message;
   @override
   @JsonKey(ignore: true)
   _$$_LoadingCopyWith<_$_Loading> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class _$$_ContentCopyWith<$Res> implements $AuthState1CopyWith<$Res> {
-  factory _$$_ContentCopyWith(
-          _$_Content value, $Res Function(_$_Content) then) =
-      __$$_ContentCopyWithImpl<$Res>;
-  @override
-  $Res call({User user, AuthError? authError});
-}
-
-/// @nodoc
-class __$$_ContentCopyWithImpl<$Res> extends _$AuthState1CopyWithImpl<$Res>
-    implements _$$_ContentCopyWith<$Res> {
-  __$$_ContentCopyWithImpl(_$_Content _value, $Res Function(_$_Content) _then)
-      : super(_value, (v) => _then(v as _$_Content));
-
-  @override
-  _$_Content get _value => super._value as _$_Content;
-
-  @override
-  $Res call({
-    Object? user = freezed,
-    Object? authError = freezed,
-  }) {
-    return _then(_$_Content(
-      user == freezed
-          ? _value.user
-          : user // ignore: cast_nullable_to_non_nullable
-              as User,
-      authError == freezed
-          ? _value.authError
-          : authError // ignore: cast_nullable_to_non_nullable
-              as AuthError?,
-    ));
-  }
-}
-
-/// @nodoc
-
-class _$_Content implements _Content {
-  const _$_Content(this.user, [this.authError]);
-
-  @override
-  final User user;
-  @override
-  final AuthError? authError;
-
-  @override
-  String toString() {
-    return 'AuthState1.content(user: $user, authError: $authError)';
-  }
-
-  @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$_Content &&
-            const DeepCollectionEquality().equals(other.user, user) &&
-            const DeepCollectionEquality().equals(other.authError, authError));
-  }
-
-  @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(user),
-      const DeepCollectionEquality().hash(authError));
-
-  @JsonKey(ignore: true)
-  @override
-  _$$_ContentCopyWith<_$_Content> get copyWith =>
-      __$$_ContentCopyWithImpl<_$_Content>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(User user, AuthError? authError) loading,
-    required TResult Function(User user, AuthError? authError) content,
-    required TResult Function(User user, AuthError authError) error,
-    required TResult Function(User user, AuthError? authError) initial,
-    required TResult Function(User user, AuthError? authError) userUpdated,
-  }) {
-    return content(user, authError);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(User user, AuthError? authError)? loading,
-    TResult Function(User user, AuthError? authError)? content,
-    TResult Function(User user, AuthError authError)? error,
-    TResult Function(User user, AuthError? authError)? initial,
-    TResult Function(User user, AuthError? authError)? userUpdated,
-  }) {
-    return content?.call(user, authError);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(User user, AuthError? authError)? loading,
-    TResult Function(User user, AuthError? authError)? content,
-    TResult Function(User user, AuthError authError)? error,
-    TResult Function(User user, AuthError? authError)? initial,
-    TResult Function(User user, AuthError? authError)? userUpdated,
-    required TResult orElse(),
-  }) {
-    if (content != null) {
-      return content(user, authError);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(_Loading value) loading,
-    required TResult Function(_Content value) content,
-    required TResult Function(_Error value) error,
-    required TResult Function(_Initial value) initial,
-    required TResult Function(_UserUpdated value) userUpdated,
-  }) {
-    return content(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Loading value)? loading,
-    TResult Function(_Content value)? content,
-    TResult Function(_Error value)? error,
-    TResult Function(_Initial value)? initial,
-    TResult Function(_UserUpdated value)? userUpdated,
-  }) {
-    return content?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Loading value)? loading,
-    TResult Function(_Content value)? content,
-    TResult Function(_Error value)? error,
-    TResult Function(_Initial value)? initial,
-    TResult Function(_UserUpdated value)? userUpdated,
-    required TResult orElse(),
-  }) {
-    if (content != null) {
-      return content(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class _Content implements AuthState1 {
-  const factory _Content(final User user, [final AuthError? authError]) =
-      _$_Content;
-
-  @override
-  User get user;
-  AuthError? get authError;
-  @override
-  @JsonKey(ignore: true)
-  _$$_ContentCopyWith<_$_Content> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -511,11 +364,15 @@ class _$_Error implements _Error {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(User user, AuthError? authError) loading,
-    required TResult Function(User user, AuthError? authError) content,
+    required TResult Function(User user, AuthError? authError, String? message)
+        loading,
     required TResult Function(User user, AuthError authError) error,
-    required TResult Function(User user, AuthError? authError) initial,
-    required TResult Function(User user, AuthError? authError) userUpdated,
+    required TResult Function(User user, AuthError? authError, String? message)
+        initial,
+    required TResult Function(User user, AuthError? authError, String? message)
+        content,
+    required TResult Function(User user, AuthError? authError, String? message)
+        success,
   }) {
     return error(user, authError);
   }
@@ -523,11 +380,11 @@ class _$_Error implements _Error {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(User user, AuthError? authError)? loading,
-    TResult Function(User user, AuthError? authError)? content,
+    TResult Function(User user, AuthError? authError, String? message)? loading,
     TResult Function(User user, AuthError authError)? error,
-    TResult Function(User user, AuthError? authError)? initial,
-    TResult Function(User user, AuthError? authError)? userUpdated,
+    TResult Function(User user, AuthError? authError, String? message)? initial,
+    TResult Function(User user, AuthError? authError, String? message)? content,
+    TResult Function(User user, AuthError? authError, String? message)? success,
   }) {
     return error?.call(user, authError);
   }
@@ -535,11 +392,11 @@ class _$_Error implements _Error {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(User user, AuthError? authError)? loading,
-    TResult Function(User user, AuthError? authError)? content,
+    TResult Function(User user, AuthError? authError, String? message)? loading,
     TResult Function(User user, AuthError authError)? error,
-    TResult Function(User user, AuthError? authError)? initial,
-    TResult Function(User user, AuthError? authError)? userUpdated,
+    TResult Function(User user, AuthError? authError, String? message)? initial,
+    TResult Function(User user, AuthError? authError, String? message)? content,
+    TResult Function(User user, AuthError? authError, String? message)? success,
     required TResult orElse(),
   }) {
     if (error != null) {
@@ -552,10 +409,10 @@ class _$_Error implements _Error {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Loading value) loading,
-    required TResult Function(_Content value) content,
     required TResult Function(_Error value) error,
     required TResult Function(_Initial value) initial,
-    required TResult Function(_UserUpdated value) userUpdated,
+    required TResult Function(_Content value) content,
+    required TResult Function(_Success value) success,
   }) {
     return error(this);
   }
@@ -564,10 +421,10 @@ class _$_Error implements _Error {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult Function(_Loading value)? loading,
-    TResult Function(_Content value)? content,
     TResult Function(_Error value)? error,
     TResult Function(_Initial value)? initial,
-    TResult Function(_UserUpdated value)? userUpdated,
+    TResult Function(_Content value)? content,
+    TResult Function(_Success value)? success,
   }) {
     return error?.call(this);
   }
@@ -576,10 +433,10 @@ class _$_Error implements _Error {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Loading value)? loading,
-    TResult Function(_Content value)? content,
     TResult Function(_Error value)? error,
     TResult Function(_Initial value)? initial,
-    TResult Function(_UserUpdated value)? userUpdated,
+    TResult Function(_Content value)? content,
+    TResult Function(_Success value)? success,
     required TResult orElse(),
   }) {
     if (error != null) {
@@ -607,7 +464,7 @@ abstract class _$$_InitialCopyWith<$Res> implements $AuthState1CopyWith<$Res> {
           _$_Initial value, $Res Function(_$_Initial) then) =
       __$$_InitialCopyWithImpl<$Res>;
   @override
-  $Res call({User user, AuthError? authError});
+  $Res call({User user, AuthError? authError, String? message});
 }
 
 /// @nodoc
@@ -623,6 +480,7 @@ class __$$_InitialCopyWithImpl<$Res> extends _$AuthState1CopyWithImpl<$Res>
   $Res call({
     Object? user = freezed,
     Object? authError = freezed,
+    Object? message = freezed,
   }) {
     return _then(_$_Initial(
       user == freezed
@@ -633,6 +491,10 @@ class __$$_InitialCopyWithImpl<$Res> extends _$AuthState1CopyWithImpl<$Res>
           ? _value.authError
           : authError // ignore: cast_nullable_to_non_nullable
               as AuthError?,
+      message == freezed
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -640,16 +502,18 @@ class __$$_InitialCopyWithImpl<$Res> extends _$AuthState1CopyWithImpl<$Res>
 /// @nodoc
 
 class _$_Initial implements _Initial {
-  const _$_Initial(this.user, [this.authError]);
+  const _$_Initial(this.user, [this.authError, this.message]);
 
   @override
   final User user;
   @override
   final AuthError? authError;
+  @override
+  final String? message;
 
   @override
   String toString() {
-    return 'AuthState1.initial(user: $user, authError: $authError)';
+    return 'AuthState1.initial(user: $user, authError: $authError, message: $message)';
   }
 
   @override
@@ -658,14 +522,16 @@ class _$_Initial implements _Initial {
         (other.runtimeType == runtimeType &&
             other is _$_Initial &&
             const DeepCollectionEquality().equals(other.user, user) &&
-            const DeepCollectionEquality().equals(other.authError, authError));
+            const DeepCollectionEquality().equals(other.authError, authError) &&
+            const DeepCollectionEquality().equals(other.message, message));
   }
 
   @override
   int get hashCode => Object.hash(
       runtimeType,
       const DeepCollectionEquality().hash(user),
-      const DeepCollectionEquality().hash(authError));
+      const DeepCollectionEquality().hash(authError),
+      const DeepCollectionEquality().hash(message));
 
   @JsonKey(ignore: true)
   @override
@@ -675,39 +541,43 @@ class _$_Initial implements _Initial {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(User user, AuthError? authError) loading,
-    required TResult Function(User user, AuthError? authError) content,
+    required TResult Function(User user, AuthError? authError, String? message)
+        loading,
     required TResult Function(User user, AuthError authError) error,
-    required TResult Function(User user, AuthError? authError) initial,
-    required TResult Function(User user, AuthError? authError) userUpdated,
+    required TResult Function(User user, AuthError? authError, String? message)
+        initial,
+    required TResult Function(User user, AuthError? authError, String? message)
+        content,
+    required TResult Function(User user, AuthError? authError, String? message)
+        success,
   }) {
-    return initial(user, authError);
+    return initial(user, authError, message);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(User user, AuthError? authError)? loading,
-    TResult Function(User user, AuthError? authError)? content,
+    TResult Function(User user, AuthError? authError, String? message)? loading,
     TResult Function(User user, AuthError authError)? error,
-    TResult Function(User user, AuthError? authError)? initial,
-    TResult Function(User user, AuthError? authError)? userUpdated,
+    TResult Function(User user, AuthError? authError, String? message)? initial,
+    TResult Function(User user, AuthError? authError, String? message)? content,
+    TResult Function(User user, AuthError? authError, String? message)? success,
   }) {
-    return initial?.call(user, authError);
+    return initial?.call(user, authError, message);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(User user, AuthError? authError)? loading,
-    TResult Function(User user, AuthError? authError)? content,
+    TResult Function(User user, AuthError? authError, String? message)? loading,
     TResult Function(User user, AuthError authError)? error,
-    TResult Function(User user, AuthError? authError)? initial,
-    TResult Function(User user, AuthError? authError)? userUpdated,
+    TResult Function(User user, AuthError? authError, String? message)? initial,
+    TResult Function(User user, AuthError? authError, String? message)? content,
+    TResult Function(User user, AuthError? authError, String? message)? success,
     required TResult orElse(),
   }) {
     if (initial != null) {
-      return initial(user, authError);
+      return initial(user, authError, message);
     }
     return orElse();
   }
@@ -716,10 +586,10 @@ class _$_Initial implements _Initial {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Loading value) loading,
-    required TResult Function(_Content value) content,
     required TResult Function(_Error value) error,
     required TResult Function(_Initial value) initial,
-    required TResult Function(_UserUpdated value) userUpdated,
+    required TResult Function(_Content value) content,
+    required TResult Function(_Success value) success,
   }) {
     return initial(this);
   }
@@ -728,10 +598,10 @@ class _$_Initial implements _Initial {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult Function(_Loading value)? loading,
-    TResult Function(_Content value)? content,
     TResult Function(_Error value)? error,
     TResult Function(_Initial value)? initial,
-    TResult Function(_UserUpdated value)? userUpdated,
+    TResult Function(_Content value)? content,
+    TResult Function(_Success value)? success,
   }) {
     return initial?.call(this);
   }
@@ -740,10 +610,10 @@ class _$_Initial implements _Initial {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Loading value)? loading,
-    TResult Function(_Content value)? content,
     TResult Function(_Error value)? error,
     TResult Function(_Initial value)? initial,
-    TResult Function(_UserUpdated value)? userUpdated,
+    TResult Function(_Content value)? content,
+    TResult Function(_Success value)? success,
     required TResult orElse(),
   }) {
     if (initial != null) {
@@ -754,12 +624,13 @@ class _$_Initial implements _Initial {
 }
 
 abstract class _Initial implements AuthState1 {
-  const factory _Initial(final User user, [final AuthError? authError]) =
-      _$_Initial;
+  const factory _Initial(final User user,
+      [final AuthError? authError, final String? message]) = _$_Initial;
 
   @override
   User get user;
   AuthError? get authError;
+  String? get message;
   @override
   @JsonKey(ignore: true)
   _$$_InitialCopyWith<_$_Initial> get copyWith =>
@@ -767,31 +638,30 @@ abstract class _Initial implements AuthState1 {
 }
 
 /// @nodoc
-abstract class _$$_UserUpdatedCopyWith<$Res>
-    implements $AuthState1CopyWith<$Res> {
-  factory _$$_UserUpdatedCopyWith(
-          _$_UserUpdated value, $Res Function(_$_UserUpdated) then) =
-      __$$_UserUpdatedCopyWithImpl<$Res>;
+abstract class _$$_ContentCopyWith<$Res> implements $AuthState1CopyWith<$Res> {
+  factory _$$_ContentCopyWith(
+          _$_Content value, $Res Function(_$_Content) then) =
+      __$$_ContentCopyWithImpl<$Res>;
   @override
-  $Res call({User user, AuthError? authError});
+  $Res call({User user, AuthError? authError, String? message});
 }
 
 /// @nodoc
-class __$$_UserUpdatedCopyWithImpl<$Res> extends _$AuthState1CopyWithImpl<$Res>
-    implements _$$_UserUpdatedCopyWith<$Res> {
-  __$$_UserUpdatedCopyWithImpl(
-      _$_UserUpdated _value, $Res Function(_$_UserUpdated) _then)
-      : super(_value, (v) => _then(v as _$_UserUpdated));
+class __$$_ContentCopyWithImpl<$Res> extends _$AuthState1CopyWithImpl<$Res>
+    implements _$$_ContentCopyWith<$Res> {
+  __$$_ContentCopyWithImpl(_$_Content _value, $Res Function(_$_Content) _then)
+      : super(_value, (v) => _then(v as _$_Content));
 
   @override
-  _$_UserUpdated get _value => super._value as _$_UserUpdated;
+  _$_Content get _value => super._value as _$_Content;
 
   @override
   $Res call({
     Object? user = freezed,
     Object? authError = freezed,
+    Object? message = freezed,
   }) {
-    return _then(_$_UserUpdated(
+    return _then(_$_Content(
       user == freezed
           ? _value.user
           : user // ignore: cast_nullable_to_non_nullable
@@ -800,81 +670,93 @@ class __$$_UserUpdatedCopyWithImpl<$Res> extends _$AuthState1CopyWithImpl<$Res>
           ? _value.authError
           : authError // ignore: cast_nullable_to_non_nullable
               as AuthError?,
+      message == freezed
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
 
 /// @nodoc
 
-class _$_UserUpdated implements _UserUpdated {
-  const _$_UserUpdated(this.user, [this.authError]);
+class _$_Content implements _Content {
+  const _$_Content(this.user, [this.authError, this.message]);
 
   @override
   final User user;
   @override
   final AuthError? authError;
+  @override
+  final String? message;
 
   @override
   String toString() {
-    return 'AuthState1.userUpdated(user: $user, authError: $authError)';
+    return 'AuthState1.content(user: $user, authError: $authError, message: $message)';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_UserUpdated &&
+            other is _$_Content &&
             const DeepCollectionEquality().equals(other.user, user) &&
-            const DeepCollectionEquality().equals(other.authError, authError));
+            const DeepCollectionEquality().equals(other.authError, authError) &&
+            const DeepCollectionEquality().equals(other.message, message));
   }
 
   @override
   int get hashCode => Object.hash(
       runtimeType,
       const DeepCollectionEquality().hash(user),
-      const DeepCollectionEquality().hash(authError));
+      const DeepCollectionEquality().hash(authError),
+      const DeepCollectionEquality().hash(message));
 
   @JsonKey(ignore: true)
   @override
-  _$$_UserUpdatedCopyWith<_$_UserUpdated> get copyWith =>
-      __$$_UserUpdatedCopyWithImpl<_$_UserUpdated>(this, _$identity);
+  _$$_ContentCopyWith<_$_Content> get copyWith =>
+      __$$_ContentCopyWithImpl<_$_Content>(this, _$identity);
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(User user, AuthError? authError) loading,
-    required TResult Function(User user, AuthError? authError) content,
+    required TResult Function(User user, AuthError? authError, String? message)
+        loading,
     required TResult Function(User user, AuthError authError) error,
-    required TResult Function(User user, AuthError? authError) initial,
-    required TResult Function(User user, AuthError? authError) userUpdated,
+    required TResult Function(User user, AuthError? authError, String? message)
+        initial,
+    required TResult Function(User user, AuthError? authError, String? message)
+        content,
+    required TResult Function(User user, AuthError? authError, String? message)
+        success,
   }) {
-    return userUpdated(user, authError);
+    return content(user, authError, message);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(User user, AuthError? authError)? loading,
-    TResult Function(User user, AuthError? authError)? content,
+    TResult Function(User user, AuthError? authError, String? message)? loading,
     TResult Function(User user, AuthError authError)? error,
-    TResult Function(User user, AuthError? authError)? initial,
-    TResult Function(User user, AuthError? authError)? userUpdated,
+    TResult Function(User user, AuthError? authError, String? message)? initial,
+    TResult Function(User user, AuthError? authError, String? message)? content,
+    TResult Function(User user, AuthError? authError, String? message)? success,
   }) {
-    return userUpdated?.call(user, authError);
+    return content?.call(user, authError, message);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(User user, AuthError? authError)? loading,
-    TResult Function(User user, AuthError? authError)? content,
+    TResult Function(User user, AuthError? authError, String? message)? loading,
     TResult Function(User user, AuthError authError)? error,
-    TResult Function(User user, AuthError? authError)? initial,
-    TResult Function(User user, AuthError? authError)? userUpdated,
+    TResult Function(User user, AuthError? authError, String? message)? initial,
+    TResult Function(User user, AuthError? authError, String? message)? content,
+    TResult Function(User user, AuthError? authError, String? message)? success,
     required TResult orElse(),
   }) {
-    if (userUpdated != null) {
-      return userUpdated(user, authError);
+    if (content != null) {
+      return content(user, authError, message);
     }
     return orElse();
   }
@@ -883,52 +765,232 @@ class _$_UserUpdated implements _UserUpdated {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Loading value) loading,
-    required TResult Function(_Content value) content,
     required TResult Function(_Error value) error,
     required TResult Function(_Initial value) initial,
-    required TResult Function(_UserUpdated value) userUpdated,
+    required TResult Function(_Content value) content,
+    required TResult Function(_Success value) success,
   }) {
-    return userUpdated(this);
+    return content(this);
   }
 
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult Function(_Loading value)? loading,
-    TResult Function(_Content value)? content,
     TResult Function(_Error value)? error,
     TResult Function(_Initial value)? initial,
-    TResult Function(_UserUpdated value)? userUpdated,
+    TResult Function(_Content value)? content,
+    TResult Function(_Success value)? success,
   }) {
-    return userUpdated?.call(this);
+    return content?.call(this);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Loading value)? loading,
-    TResult Function(_Content value)? content,
     TResult Function(_Error value)? error,
     TResult Function(_Initial value)? initial,
-    TResult Function(_UserUpdated value)? userUpdated,
+    TResult Function(_Content value)? content,
+    TResult Function(_Success value)? success,
     required TResult orElse(),
   }) {
-    if (userUpdated != null) {
-      return userUpdated(this);
+    if (content != null) {
+      return content(this);
     }
     return orElse();
   }
 }
 
-abstract class _UserUpdated implements AuthState1 {
-  const factory _UserUpdated(final User user, [final AuthError? authError]) =
-      _$_UserUpdated;
+abstract class _Content implements AuthState1 {
+  const factory _Content(final User user,
+      [final AuthError? authError, final String? message]) = _$_Content;
 
   @override
   User get user;
   AuthError? get authError;
+  String? get message;
   @override
   @JsonKey(ignore: true)
-  _$$_UserUpdatedCopyWith<_$_UserUpdated> get copyWith =>
+  _$$_ContentCopyWith<_$_Content> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$_SuccessCopyWith<$Res> implements $AuthState1CopyWith<$Res> {
+  factory _$$_SuccessCopyWith(
+          _$_Success value, $Res Function(_$_Success) then) =
+      __$$_SuccessCopyWithImpl<$Res>;
+  @override
+  $Res call({User user, AuthError? authError, String? message});
+}
+
+/// @nodoc
+class __$$_SuccessCopyWithImpl<$Res> extends _$AuthState1CopyWithImpl<$Res>
+    implements _$$_SuccessCopyWith<$Res> {
+  __$$_SuccessCopyWithImpl(_$_Success _value, $Res Function(_$_Success) _then)
+      : super(_value, (v) => _then(v as _$_Success));
+
+  @override
+  _$_Success get _value => super._value as _$_Success;
+
+  @override
+  $Res call({
+    Object? user = freezed,
+    Object? authError = freezed,
+    Object? message = freezed,
+  }) {
+    return _then(_$_Success(
+      user == freezed
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User,
+      authError == freezed
+          ? _value.authError
+          : authError // ignore: cast_nullable_to_non_nullable
+              as AuthError?,
+      message == freezed
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$_Success implements _Success {
+  const _$_Success(this.user, [this.authError, this.message]);
+
+  @override
+  final User user;
+  @override
+  final AuthError? authError;
+  @override
+  final String? message;
+
+  @override
+  String toString() {
+    return 'AuthState1.success(user: $user, authError: $authError, message: $message)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$_Success &&
+            const DeepCollectionEquality().equals(other.user, user) &&
+            const DeepCollectionEquality().equals(other.authError, authError) &&
+            const DeepCollectionEquality().equals(other.message, message));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(user),
+      const DeepCollectionEquality().hash(authError),
+      const DeepCollectionEquality().hash(message));
+
+  @JsonKey(ignore: true)
+  @override
+  _$$_SuccessCopyWith<_$_Success> get copyWith =>
+      __$$_SuccessCopyWithImpl<_$_Success>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(User user, AuthError? authError, String? message)
+        loading,
+    required TResult Function(User user, AuthError authError) error,
+    required TResult Function(User user, AuthError? authError, String? message)
+        initial,
+    required TResult Function(User user, AuthError? authError, String? message)
+        content,
+    required TResult Function(User user, AuthError? authError, String? message)
+        success,
+  }) {
+    return success(user, authError, message);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult Function(User user, AuthError? authError, String? message)? loading,
+    TResult Function(User user, AuthError authError)? error,
+    TResult Function(User user, AuthError? authError, String? message)? initial,
+    TResult Function(User user, AuthError? authError, String? message)? content,
+    TResult Function(User user, AuthError? authError, String? message)? success,
+  }) {
+    return success?.call(user, authError, message);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(User user, AuthError? authError, String? message)? loading,
+    TResult Function(User user, AuthError authError)? error,
+    TResult Function(User user, AuthError? authError, String? message)? initial,
+    TResult Function(User user, AuthError? authError, String? message)? content,
+    TResult Function(User user, AuthError? authError, String? message)? success,
+    required TResult orElse(),
+  }) {
+    if (success != null) {
+      return success(user, authError, message);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Loading value) loading,
+    required TResult Function(_Error value) error,
+    required TResult Function(_Initial value) initial,
+    required TResult Function(_Content value) content,
+    required TResult Function(_Success value) success,
+  }) {
+    return success(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult Function(_Loading value)? loading,
+    TResult Function(_Error value)? error,
+    TResult Function(_Initial value)? initial,
+    TResult Function(_Content value)? content,
+    TResult Function(_Success value)? success,
+  }) {
+    return success?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Loading value)? loading,
+    TResult Function(_Error value)? error,
+    TResult Function(_Initial value)? initial,
+    TResult Function(_Content value)? content,
+    TResult Function(_Success value)? success,
+    required TResult orElse(),
+  }) {
+    if (success != null) {
+      return success(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _Success implements AuthState1 {
+  const factory _Success(final User user,
+      [final AuthError? authError, final String? message]) = _$_Success;
+
+  @override
+  User get user;
+  AuthError? get authError;
+  String? get message;
+  @override
+  @JsonKey(ignore: true)
+  _$$_SuccessCopyWith<_$_Success> get copyWith =>
       throw _privateConstructorUsedError;
 }

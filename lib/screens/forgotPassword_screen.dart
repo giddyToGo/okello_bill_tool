@@ -136,12 +136,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                   )),
                                 ),
                                 onPressed: () async {
-                                  print('clicked reset password');
-                                  String message = await context
+                                  await context
                                       .read<AuthCubit>()
                                       .authResetPassword(email: email);
                                   Navigator.pushNamed(context, SignInScreen.id);
-                                  snackBar(message);
                                 },
                                 child: const Padding(
                                   padding: EdgeInsets.symmetric(vertical: 5),

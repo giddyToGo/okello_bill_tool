@@ -37,7 +37,7 @@ class _SignUpPageState extends State<SignUpPage> {
     final isLoading = context
         .watch<AuthCubit>()
         .state
-        .maybeWhen(loading: (user, e) => true, orElse: () => false);
+        .maybeWhen(loading: (user, e, message) => true, orElse: () => false);
 
     return Scaffold(
       backgroundColor: Colors.white,
