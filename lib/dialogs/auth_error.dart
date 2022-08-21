@@ -37,14 +37,6 @@ class AuthErrorUnknown extends AuthError {
         );
 }
 
-class AuthErrorNoInternet extends AuthError {
-  const AuthErrorNoInternet()
-      : super(
-          dialogTitle: 'No Internet!',
-          dialogText: 'Please reconnect !!',
-        );
-}
-
 // auth/no-current-user
 
 @immutable

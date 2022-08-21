@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-enum SignUpOption { emailPassword, google, twitter, facebook, unknown }
+
+enum SignUpOption { emailPassword, google, twitter, facebook }
 
 class User {
   final String email;
@@ -8,19 +9,16 @@ class User {
   final SignUpOption signUpOption;
   final bool? signedIn;
 
-  User({
-    required this.email,
+  User({required this.email,
     required this.uid,
-    this.name = '',
-    this.phone = '',
-    this.profilePic = '',
-    this.signUpOption = SignUpOption.unknown,
-    this.signedIn = true,
+    this.name,
+    this.phone,
+    this.profilePic,
+    this.signUpOption = SignUpOption.emailPassword,
+    this.signedIn,
   });
 
   User.empty() : this(email: "", uid: "");
-
-  bool get isSignedIn => uid != null && (uid?.isNotEmpty ?? false);
 
   User copyWith({
     String? name,
@@ -29,6 +27,7 @@ class User {
     String? profilePic,
     bool? signedIn,
     signUpOption,
+
   }) {
     return User(
       name: name ?? this.name,
@@ -44,6 +43,15 @@ class User {
   // changeImageUrl({required String imageUrl}) {
   //   profilePic = imageUrl;
   // }
+
+  User.signedUpWithGoogle()
+      : email = "",
+        phone = "",
+        signUpOption = SignUpOption.google,
+        name = "",
+        profilePic = "",
+        uid = "",
+        signedIn = true;
 
   String toJson() {
     final userMap = {
@@ -84,9 +92,7 @@ SignUpOption convertToSignUpOption(String option, {required uid}) {
     return SignUpOption.google;
   } else if (option == SignUpOption.facebook.name) {
     return SignUpOption.facebook;
-  } else if (option == SignUpOption.twitter.name) {
-    return SignUpOption.twitter;
   } else {
-    return SignUpOption.unknown;
+    return SignUpOption.twitter;
   }
 }

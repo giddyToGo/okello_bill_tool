@@ -1,12 +1,9 @@
-import 'dart:developer';
-
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:hive/hive.dart';
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:okello_bill_tool/dialogs/auth_error.dart';
 import 'package:okello_bill_tool/firebase_options.dart';
 import 'package:okello_bill_tool/logic/cubits/auth/auth_state.dart';
 import 'package:okello_bill_tool/logic/cubits/internet/internet_cubit.dart';
@@ -80,79 +77,57 @@ class MyApp extends StatelessWidget {
         UserSettingsScreen.id: (_) => const UserSettingsScreen(),
         ForgotPasswordScreen.id: (_) => const ForgotPasswordScreen(),
       },
-      home: BlocListener<AuthCubit, AuthState1>(listener: (context, state) {
-        log('current state is $state');
-
-        /// If in ---LOADING--- state, then show loading screen with message or 'Loading...'
-        state.maybeWhen(loading: (__, _, message) {
-          LoadingScreen.instance().show(
-            context: context,
-            text: message ?? 'Loading... ',
-          );
-        },
-
-            /// if in ---ERROR--- state then show error screen with dialog.
-            error: (_, authError) {
-          if (authError is AuthErrorNoInternet) {
-            context.read<InternetCubit>().emitInternetDisconnected();
-            return;
-          }
-          LoadingScreen.instance().hide();
-          showAuthError(
-            authError: authError,
-            context: context,
-          );
-        },
-
-            /// If in ---CONTENT--- state, then show message and navigate to Home Screen
-            content: (user, __, message) {
-          LoadingScreen.instance().hide();
-          message != null
-              ? ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(message.toString())))
-              : null;
-          if (user.isSignedIn) {
-            Navigator.pushNamed(context, HomeScreen.id);
-          }
-        },
-
-            /// If in ---INITIAL--- state, then show message. if user.signedIn then show homescreen
-            initial: (user, __, message) {
-          LoadingScreen.instance().hide();
-          message != null
-              ? ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(message.toString())))
-              : null;
-        },
-
-            /// if in ---SUCCESS--- state, then show message
-            success: (_, __, message) {
-          LoadingScreen.instance().hide();
-          message != null
-              ? ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(message.toString())))
-              : null;
-        }, orElse: () {
-          LoadingScreen.instance().hide();
-        });
-      }, child:
-          BlocBuilder<InternetCubit, InternetState>(builder: (context, state) {
-        return SafeArea(
-          child: Scaffold(
-              body: Column(
-            children: [
-              if (state is InternetDisconnected)
-                Container(
-                  color: Colors.red,
-                  height: 40,
-                  width: double.infinity,
-                  child: const Text("Please connect !!!"),
-                ),
-              const Expanded(child: SplashScreen()),
-            ],
+      home: BlocListener<AuthCubit, AuthState1>(
+          listener: (context, state) {
+            state.maybeWhen(loading: (__, _, message) {
+              LoadingScreen.instance().show(
+                context: context,
+                text: message ?? 'Loading... ',
+              );
+            }, error: (_, authError) {
+              LoadingScreen.instance().hide();
+              showAuthError(
+                authError: authError,
+                context: context,
+              );
+            }, content: (_, __, message) {
+              LoadingScreen.instance().hide();
+              message != null
+                  ? ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(message.toString())))
+                  : null;
+              Navigator.pushNamed(context, HomeScreen.id);
+            }, initial: (user, __, message) {
+              LoadingScreen.instance().hide();
+              bool signedIn = user.signedIn ?? false;
+              !signedIn ? Navigator.pushNamed(context, SignInScreen.id) : null;
+              message != null
+                  ? ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(message.toString())))
+                  : null;
+            }, success: (_, __, message) {
+              LoadingScreen.instance().hide();
+              message != null
+                  ? ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(message.toString())))
+                  : null;
+            }, orElse: () {
+              LoadingScreen.instance().hide();
+            });
+          },
+          child: BlocListener<InternetCubit, InternetState>(
+            listener: (context, state) {
+              if (state is InternetDisconnected) {
+                LoadingScreen.instance().show(
+                  context: context,
+                  text: 'Internet is down, please reconnect',
+                );
+              } else if (state is InternetConnected) {
+                LoadingScreen.instance().hide();
+              }
+            },
+            child: const SplashScreen(),
           )),
-        );
-      })),
     ));
   }
 }
@@ -165,15 +140,23 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  late final bool isSignedIn;
+
   @override
   void initState() {
     super.initState();
 
+    final jsonUser = Hive.box("users_box").get("user");
     context.read<AuthCubit>().initialiseFromLocalStorage();
+    User user = User.fromJson(jsonUser);
+    isSignedIn = user.signedIn ?? false;
   }
 
   @override
   Widget build(BuildContext context) {
-    return const SignInScreen();
+    // bool state = context.read<AuthCubit>().checkForExistingUserInLocalStorage();
+    // bool? isSignedIn = context.read<AuthCubit>().state.user.signedIn ?? false;
+
+    return isSignedIn ? const HomeScreen() : const SignInScreen();
   }
 }
