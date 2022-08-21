@@ -1,3 +1,5 @@
+import "dart:async";
+
 import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:hive/hive.dart';
 import 'package:okello_bill_tool/repositories/firebase_auth_methods.dart';
@@ -6,8 +8,6 @@ import 'package:okello_bill_tool/screens/source.dart';
 import '../../../dialogs/auth_error.dart';
 import '../../../models/user_model.dart';
 import 'auth_state.dart';
-
-import "dart:async";
 
 class AuthCubit extends Cubit<AuthState1> {
   AuthCubit()
@@ -18,23 +18,57 @@ class AuthCubit extends Cubit<AuthState1> {
 
   AuthRepository authMethods = AuthRepository();
 
-  doSth() async {}
+  _handleError(e) {
+    if (e is SocketException) {
+      emit(AuthState1.error(state.user, const AuthErrorNoInternet()));
+    } else if (e is TimeoutException) {
+      emit(AuthState1.error(state.user, const AuthErrorNoInternet()));
+    } else if (e is FirebaseAuthException) {
+      emit(AuthState1.error(state.user,
+          AuthError(dialogText: e.message ?? "Unknown", dialogTitle: e.code)));
+    } else {
+      emit(AuthState1.error(
+          state.user,
+          AuthError(
+              dialogText: e.toString(), dialogTitle: 'An Error Happened')));
+    }
+  }
 
   void initialiseFromLocalStorage() {
+    print(
+        'initialiseFromLocalStorage: about to emit loading state from initialiseFromLocalStorage');
+    emit(AuthState1.loading(
+        state.user, null, 'initialising from local storage...'));
     final usersBox = Hive.box("users_box");
     final jsonUser = usersBox.get("user");
     final User user = User.fromJson(jsonUser);
-    emit(AuthState1.initial(user, null,
-        "Found user in local storage. User signed in? ${user.signedIn}"));
+
+    if (user.signedIn == true) {
+      emit(AuthState1.content(user, null,
+          "Found user in local storage. User signed in? ${user.signedIn}"));
+    } else if (user.signedIn == false) {
+      emit(AuthState1.initial(user, null,
+          "Found user in local storage. User signed in? ${user.signedIn}"));
+    } else {
+      emit(AuthState1.initial(user, null,
+          "found user in local storage user signed in = null probably"));
+    }
+    print(
+        'initialiseFromLocalStorage: state after initialise from local signedIn? selection ${state.toString()}');
   }
 
   Future<void> updateUserDetails(User user) async {
-    final usersBox = Hive.box("users_box");
-    usersBox.put("user", user.toJson());
-    final jsonUser = Hive.box("users_box").get("user");
-    authMethods.updateUserDetails(user);
-    emit(AuthState1.success(
-        User.fromJson(jsonUser), null, "Successfully updated"));
+    try {
+      final usersBox = Hive.box("users_box");
+      usersBox.put("user", user.toJson());
+      final jsonUser = Hive.box("users_box").get("user");
+      authMethods.updateFirestoreUser(user);
+      authMethods.updateUserDetails(user);
+      emit(AuthState1.success(
+          User.fromJson(jsonUser), null, "Successfully updated"));
+    } catch (e) {
+      _handleError(e);
+    }
   }
 
   Future<void> authUploadImage({required String path}) async {
@@ -58,22 +92,6 @@ class AuthCubit extends Cubit<AuthState1> {
     // log user out if we don't have an actual user in app auth
   }
 
-  _handleError(e) {
-    if (e is SocketException) {
-      emit(AuthState1.error(state.user, const AuthErrorNoInternet()));
-    } else if (e is TimeoutException) {
-      emit(AuthState1.error(state.user, const AuthErrorNoInternet()));
-    } else if (e is FirebaseAuthException) {
-      emit(AuthState1.error(state.user,
-          AuthError(dialogText: e.message ?? "Unknown", dialogTitle: e.code)));
-    } else {
-      emit(AuthState1.error(
-          state.user,
-          AuthError(
-              dialogText: e.toString(), dialogTitle: 'An Error Happened')));
-    }
-  }
-
   Future<void> checkForExistingUserInFirebase({required email}) async {
     try {
       emit(AuthState1.loading(state.user, null, 'Checking for a user'));
@@ -86,8 +104,6 @@ class AuthCubit extends Cubit<AuthState1> {
           existingUser
               ? "A user with this email exists"
               : "No user exists with this email"));
-
-      return;
     } catch (e) {
       _handleError(e);
     }
@@ -104,12 +120,17 @@ class AuthCubit extends Cubit<AuthState1> {
 
   Future<void> authSignIn(
       {required String email, required String password}) async {
+    initialiseFromLocalStorage();
     emit(AuthState1.loading(state.user, null, "Signing in..."));
     try {
+      print('authSignIn: auth Sign in doing something');
       final user =
           await authMethods.signInWithEmail(email: email, password: password);
       await Hive.box("users_box").put("user", user!.toJson());
       emit(AuthState1.content(user, null, "Successfully signed in with email"));
+      print('print this after content state emitted from authSignIn');
+      print(
+          'authSignIn: state after content emitted from authSignIn: ${state.toString()}, signedIn = ${state.user.signedIn}');
     } catch (e) {
       _handleError(e);
     }
@@ -117,22 +138,15 @@ class AuthCubit extends Cubit<AuthState1> {
 
   Future<void> authSignUp(
       {required String email, required String password}) async {
+    print('authSignUp: about to emit loading state');
     emit(AuthState1.loading(state.user, null, "Creating Account"));
     try {
       final user =
           await authMethods.signUpWithEmail(email: email, password: password);
       await Hive.box("users_box").put("user", user!.toJson());
       emit(AuthState1.content(user, null, 'Successfully signed up'));
-      return;
-    } on SocketException catch (_) {
-      emit(AuthState1.error(state.user, const AuthErrorNoInternet()));
-    } on TimeoutException catch (_) {
-      emit(AuthState1.error(state.user, const AuthErrorNoInternet()));
     } catch (e) {
-      emit(AuthState1.error(
-          state.user,
-          AuthError(
-              dialogText: e.toString(), dialogTitle: 'An Error Happened')));
+      _handleError(e);
     }
   }
 
@@ -141,14 +155,16 @@ class AuthCubit extends Cubit<AuthState1> {
     try {
       final User? user = await authMethods.signInWithGoogle();
       await Hive.box("users_box").put("user", user!.toJson());
-      final jsonUser = Hive.box("users_box").get("user");
+
       emit(
           AuthState1.content(user, null, 'Successfully signed in with Google'));
+      print("------------------------------------------------------");
+      print("emitted the content state after signing in");
+      print('state after emitted ${state.toString()}');
+
+      print("------------------------------------------------------");
     } catch (e) {
-      emit(AuthState1.error(
-          state.user,
-          AuthError(
-              dialogText: e.toString(), dialogTitle: 'An Error Happened')));
+      _handleError(e);
     }
   }
 
@@ -160,10 +176,7 @@ class AuthCubit extends Cubit<AuthState1> {
       emit(AuthState1.content(
           user, null, 'Successfully signed in with Facebook'));
     } catch (e) {
-      emit(AuthState1.error(
-          state.user,
-          AuthError(
-              dialogText: e.toString(), dialogTitle: 'An Error Happened')));
+      _handleError(e);
     }
   }
 
@@ -178,10 +191,7 @@ class AuthCubit extends Cubit<AuthState1> {
       emit(AuthState1.content(
           user, null, 'Successfully signed in with twitter'));
     } catch (e) {
-      emit(AuthState1.error(
-          state.user,
-          AuthError(
-              dialogText: e.toString(), dialogTitle: 'An Error Happened')));
+      _handleError(e);
     }
   }
 
@@ -193,10 +203,7 @@ class AuthCubit extends Cubit<AuthState1> {
       await authMethods.signOut();
       emit(AuthState1.initial(signedOutUser, null, 'Successfully signed out'));
     } catch (e) {
-      emit(AuthState1.error(
-          state.user,
-          AuthError(
-              dialogText: e.toString(), dialogTitle: 'An Error Happened')));
+      _handleError(e);
     }
   }
 
@@ -206,13 +213,8 @@ class AuthCubit extends Cubit<AuthState1> {
       await authMethods.deleteUser();
       emit(AuthState1.initial(
           User.empty(), null, 'Successfully deleted account'));
-      return;
     } catch (e) {
-      emit(AuthState1.error(
-          state.user,
-          AuthError(
-              dialogText: e.toString(), dialogTitle: 'An Error Happened')));
-      return;
+      _handleError(e);
     }
   }
 
@@ -221,12 +223,8 @@ class AuthCubit extends Cubit<AuthState1> {
     try {
       await authMethods.forgottenPassword(email: email);
       emit(AuthState1.initial(User.empty(), null, 'Password reset link sent'));
-      return;
     } catch (e) {
-      emit(AuthState1.error(
-          state.user,
-          AuthError(
-              dialogText: e.toString(), dialogTitle: 'An Error Happened')));
+      _handleError(e);
     }
   }
 }

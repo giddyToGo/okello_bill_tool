@@ -1,3 +1,4 @@
+import 'package:okello_bill_tool/screens/signIn_screen.dart';
 import 'package:okello_bill_tool/screens/user_profile_screen.dart';
 
 import '../logic/cubits/auth/auth_cubit.dart';
@@ -43,9 +44,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: BlocListener<AuthCubit, AuthState1>(
         listener: (context, state) {
-          final isSuccess = state.maybeWhen(
-              content: (_, error, message) => true, orElse: () => false);
-          if (isSuccess) Navigator.pushNamed(context, HomeScreen.id);
+          final isInitial = state.maybeWhen(
+              initial: (_, error, message) => true, orElse: () => false);
+          if (isInitial) {
+            Navigator.pushNamedAndRemoveUntil(
+                context, SignInScreen.id, (route) => false);
+          }
         },
         child: ListView(children: <Widget>[
           Container(

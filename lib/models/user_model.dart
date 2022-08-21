@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-enum SignUpOption { emailPassword, google, twitter, facebook }
+enum SignUpOption { emailPassword, google, twitter, facebook, unknown }
 
 class User {
   final String email;
@@ -11,11 +11,11 @@ class User {
   User({
     required this.email,
     required this.uid,
-    this.name,
-    this.phone,
-    this.profilePic,
-    this.signUpOption = SignUpOption.emailPassword,
-    this.signedIn,
+    this.name = '',
+    this.phone = '',
+    this.profilePic = '',
+    this.signUpOption = SignUpOption.unknown,
+    this.signedIn = true,
   });
 
   User.empty() : this(email: "", uid: "");
@@ -43,14 +43,6 @@ class User {
   //   profilePic = imageUrl;
   // }
 
-  User.signedUpWithGoogle()
-      : email = "",
-        phone = "",
-        signUpOption = SignUpOption.google,
-        name = "",
-        profilePic = "",
-        uid = "",
-        signedIn = true;
 
   String toJson() {
     final userMap = {
@@ -91,7 +83,9 @@ SignUpOption convertToSignUpOption(String option, {required uid}) {
     return SignUpOption.google;
   } else if (option == SignUpOption.facebook.name) {
     return SignUpOption.facebook;
-  } else {
+  } else if (option == SignUpOption.twitter.name) {
     return SignUpOption.twitter;
+  } else {
+    return SignUpOption.unknown;
   }
 }

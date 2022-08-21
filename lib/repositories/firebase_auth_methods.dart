@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:firebase_storage/firebase_storage.dart';
@@ -41,23 +42,13 @@ class AuthRepository {
 
     auth.User? newUser = _auth.currentUser;
     print(
-        'updated info from firebaseauthMethods. name: ${newUser?.displayName}, ---- email: ${newUser?.email}, ----- photoUrl: ${newUser?.photoURL} ');
+        'updated info from firebaseauthMethods. uid: ${user
+            .uid} ----------- name: ${newUser
+            ?.displayName}, ---- email: ${newUser
+            ?.email}, ----- photoUrl: ${newUser?.photoURL} ');
     // await _auth.currentUser?.updatePassword(newPassword);
     // await _auth.currentUser?.updatePhoneNumber(user.phone);
-    return;
   }
-
-  // returns a list of sign in options for that email address
-  // Future<String> checkForExistingUser({required email}) async {
-  //   try {
-  //     final message = await _auth.fetchSignInMethodsForEmail(email);
-  //     print('firebase fetch sign in methods $message');
-  //     return message.toString();
-  //   } on auth.FirebaseAuthException catch (e) {
-  //     print(e);
-  //     return e.code;
-  //   }
-  // }
 
   Future<String?> linkUserCredential(credential) async {
     try {
@@ -76,12 +67,13 @@ class AuthRepository {
           email: email, password: password);
       await sendEmailVerification(email: email);
       return User(
-          email: email,
-          name: credential.user!.displayName,
-          profilePic: credential.user!.photoURL,
-          signUpOption: SignUpOption.emailPassword,
-          uid: credential.user!.uid,
-          signedIn: true);
+        email: email,
+        name: credential.user!.displayName,
+        profilePic: credential.user!.photoURL ?? '',
+        signUpOption: SignUpOption.emailPassword,
+        uid: credential.user!.uid,
+        signedIn: true,
+      );
     } on auth.FirebaseAuthException catch (e) {
       throw e.code;
     }
@@ -105,7 +97,7 @@ class AuthRepository {
   Future<User?> signInWithEmail(
       {required String email, required String password}) async {
     final firebaseUser = (await _auth.signInWithEmailAndPassword(
-            email: email, password: password))
+        email: email, password: password))
         .user;
     return User(
         email: email,
@@ -113,7 +105,8 @@ class AuthRepository {
         profilePic: firebaseUser?.photoURL,
         phone: firebaseUser?.phoneNumber,
         uid: firebaseUser?.uid,
-        signedIn: true);
+        signedIn: true,
+        signUpOption: SignUpOption.emailPassword);
   }
 
 // Sign In With Google
@@ -123,6 +116,9 @@ class AuthRepository {
         var googleProvider = auth.GoogleAuthProvider();
         googleProvider
             .addScope('https://www.googleapis.com/auth/contacts.readonly');
+
+        print('testing');
+
         final firebaseUser = (await _auth.signInWithPopup(googleProvider)).user;
 
         return User(
@@ -131,13 +127,14 @@ class AuthRepository {
             profilePic: firebaseUser.photoURL,
             name: firebaseUser.displayName,
             uid: firebaseUser.uid,
-            signedIn: true);
+            signedIn: true,
+            signUpOption: SignUpOption.google);
       } else {
         final GoogleSignInAccount? googleSignInAccount =
-            await GoogleSignIn(scopes: <String>["email"]).signIn();
+        await GoogleSignIn(scopes: <String>["email"]).signIn();
 
         final GoogleSignInAuthentication googleSignInAuthentication =
-            await googleSignInAccount!.authentication;
+        await googleSignInAccount!.authentication;
 
         final credential = GoogleAuthProvider.credential(
           accessToken: googleSignInAuthentication.accessToken,
@@ -145,13 +142,16 @@ class AuthRepository {
         );
         final firebaseUser =
             (await _auth.signInWithCredential(credential)).user;
+        print(
+            '--------------------------------------------------------------firebase user from sign in with google: $firebaseUser');
         return User(
             email: firebaseUser!.email!,
             phone: firebaseUser.phoneNumber,
             profilePic: firebaseUser.photoURL,
             name: firebaseUser.displayName,
             uid: firebaseUser.uid,
-            signedIn: true);
+            signedIn: true,
+            signUpOption: SignUpOption.google);
       }
     } on auth.FirebaseAuthException {
       rethrow;
@@ -164,7 +164,7 @@ class AuthRepository {
       final LoginResult loginResult = await FacebookAuth.instance.login();
 
       final credential =
-          auth.FacebookAuthProvider.credential(loginResult.accessToken!.token);
+      auth.FacebookAuthProvider.credential(loginResult.accessToken!.token);
 
       final firebaseUser = (await _auth.signInWithCredential(credential)).user;
       final facebookUser = await FacebookAuth.instance.getUserData();
@@ -180,7 +180,8 @@ class AuthRepository {
               : facebookUser["picture"]["data"]["url"],
           name: firebaseUser.displayName,
           uid: firebaseUser.uid,
-          signedIn: true);
+          signedIn: true,
+          signUpOption: SignUpOption.facebook);
 
       // return 'Signed in successfully with Facebook';
     } on auth.FirebaseAuthException {
@@ -212,7 +213,8 @@ class AuthRepository {
               profilePic: firebaseUser.photoURL,
               name: firebaseUser.displayName,
               uid: firebaseUser.uid,
-              signedIn: true);
+              signedIn: true,
+              signUpOption: SignUpOption.twitter);
 
         case TwitterLoginStatus.cancelledByUser:
           break;
@@ -253,7 +255,6 @@ class AuthRepository {
       await GoogleSignIn().signOut();
 
       _auth.signOut();
-      return;
     } on auth.FirebaseAuthException {
       rethrow;
     }
@@ -262,12 +263,26 @@ class AuthRepository {
   Future<String> uploadImage(
       {required String path, required String? userId}) async {
     final storageBucketpath =
-        '$userId/${DateTime.now().microsecondsSinceEpoch.toString()}';
+        '$userId/${DateTime
+        .now()
+        .microsecondsSinceEpoch
+        .toString()}';
 
     final ref = FirebaseStorage.instance.ref().child(storageBucketpath);
     var uploadTask = ref.putFile(File(path));
     final snapshot = await uploadTask.whenComplete(() => {});
     final urlDownload = await snapshot.ref.getDownloadURL();
     return urlDownload;
+  }
+
+  Future<void> updateFirestoreUser(User user) async {
+    await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+      'name': user.name,
+      'email': user.email,
+      'photoURL': user.profilePic,
+      'phone': user.phone,
+      'signedIn': user.signedIn,
+      'signUpOption': user.signUpOption.name,
+    }, SetOptions(merge: true));
   }
 }
