@@ -16,7 +16,7 @@ class AuthCubit extends Cubit<AuthState1> {
   final usersBox = Hive.box("users_box");
   final jsonUser = Hive.box("users_box").get("user");
 
-  AuthRepository authMethods = AuthRepository();
+  final authMethods = AuthRepository();
 
   _handleError(e) {
     if (e is SocketException) {
@@ -35,26 +35,19 @@ class AuthCubit extends Cubit<AuthState1> {
   }
 
   void initialiseFromLocalStorage() {
-    print(
-        'initialiseFromLocalStorage: about to emit loading state from initialiseFromLocalStorage');
     emit(AuthState1.loading(
         state.user, null, 'initialising from local storage...'));
-    final usersBox = Hive.box("users_box");
-    final jsonUser = usersBox.get("user");
-    final User user = User.fromJson(jsonUser);
 
-    if (user.signedIn == true) {
+    final usersBox = Hive.box("users_box");
+    final jsonUser = usersBox.get("user") as String?;
+    if (jsonUser != null) {
+      final User user = User.fromJson(jsonUser);
       emit(AuthState1.content(user, null,
           "Found user in local storage. User signed in? ${user.signedIn}"));
-    } else if (user.signedIn == false) {
-      emit(AuthState1.initial(user, null,
-          "Found user in local storage. User signed in? ${user.signedIn}"));
     } else {
-      emit(AuthState1.initial(user, null,
-          "found user in local storage user signed in = null probably"));
+      emit(AuthState1.initial(
+          User.empty(), null, "Did not find a user in local storage"));
     }
-    print(
-        'initialiseFromLocalStorage: state after initialise from local signedIn? selection ${state.toString()}');
   }
 
   Future<void> updateUserDetails(User user) async {
@@ -123,14 +116,10 @@ class AuthCubit extends Cubit<AuthState1> {
     initialiseFromLocalStorage();
     emit(AuthState1.loading(state.user, null, "Signing in..."));
     try {
-      print('authSignIn: auth Sign in doing something');
       final user =
           await authMethods.signInWithEmail(email: email, password: password);
       await Hive.box("users_box").put("user", user!.toJson());
       emit(AuthState1.content(user, null, "Successfully signed in with email"));
-      print('print this after content state emitted from authSignIn');
-      print(
-          'authSignIn: state after content emitted from authSignIn: ${state.toString()}, signedIn = ${state.user.signedIn}');
     } catch (e) {
       _handleError(e);
     }
@@ -138,7 +127,6 @@ class AuthCubit extends Cubit<AuthState1> {
 
   Future<void> authSignUp(
       {required String email, required String password}) async {
-    print('authSignUp: about to emit loading state');
     emit(AuthState1.loading(state.user, null, "Creating Account"));
     try {
       final user =
@@ -158,11 +146,6 @@ class AuthCubit extends Cubit<AuthState1> {
 
       emit(
           AuthState1.content(user, null, 'Successfully signed in with Google'));
-      print("------------------------------------------------------");
-      print("emitted the content state after signing in");
-      print('state after emitted ${state.toString()}');
-
-      print("------------------------------------------------------");
     } catch (e) {
       _handleError(e);
     }
@@ -184,9 +167,6 @@ class AuthCubit extends Cubit<AuthState1> {
     emit(AuthState1.loading(state.user, null, "Signing in with Twitter"));
     try {
       final user = await authMethods.signInWithTwitter();
-      print(
-          'printing user data from firebase Twitter sign in. name: ${user?.name}, profilepic: ${user?.profilePic}');
-
       await Hive.box("users_box").put("user", user!.toJson());
       emit(AuthState1.content(
           user, null, 'Successfully signed in with twitter'));

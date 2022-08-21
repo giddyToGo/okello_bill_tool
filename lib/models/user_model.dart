@@ -20,6 +20,8 @@ class User {
 
   User.empty() : this(email: "", uid: "");
 
+  bool get isSignedIn => uid != null && (uid?.isNotEmpty ?? false);
+
   User copyWith({
     String? name,
     String? email,
@@ -42,7 +44,6 @@ class User {
   // changeImageUrl({required String imageUrl}) {
   //   profilePic = imageUrl;
   // }
-
 
   String toJson() {
     final userMap = {

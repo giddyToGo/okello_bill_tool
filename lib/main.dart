@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -79,8 +81,7 @@ class MyApp extends StatelessWidget {
         ForgotPasswordScreen.id: (_) => const ForgotPasswordScreen(),
       },
       home: BlocListener<AuthCubit, AuthState1>(listener: (context, state) {
-        print(
-            '------------------################---------------------current state is $state');
+        log('current state is $state');
 
         /// If in ---LOADING--- state, then show loading screen with message or 'Loading...'
         state.maybeWhen(loading: (__, _, message) {
@@ -92,7 +93,6 @@ class MyApp extends StatelessWidget {
 
             /// if in ---ERROR--- state then show error screen with dialog.
             error: (_, authError) {
-          print('Error state emitted');
           if (authError is AuthErrorNoInternet) {
             context.read<InternetCubit>().emitInternetDisconnected();
             return;
@@ -105,23 +105,20 @@ class MyApp extends StatelessWidget {
         },
 
             /// If in ---CONTENT--- state, then show message and navigate to Home Screen
-            content: (_, __, message) {
-          print('Content state emitted');
+            content: (user, __, message) {
           LoadingScreen.instance().hide();
           message != null
               ? ScaffoldMessenger.of(context)
                   .showSnackBar(SnackBar(content: Text(message.toString())))
               : null;
-          Navigator.pushNamed(context, HomeScreen.id);
-          print("--------------------------navigating to home");
+          if (user.isSignedIn) {
+            Navigator.pushNamed(context, HomeScreen.id);
+          }
         },
 
             /// If in ---INITIAL--- state, then show message. if user.signedIn then show homescreen
             initial: (user, __, message) {
-          print('Initial state emitted');
           LoadingScreen.instance().hide();
-          // bool signedIn = user.signedIn ?? false;
-          // !signedIn ? Navigator.pushNamed(context, SignInScreen.id) : null;
           message != null
               ? ScaffoldMessenger.of(context)
                   .showSnackBar(SnackBar(content: Text(message.toString())))
@@ -130,7 +127,6 @@ class MyApp extends StatelessWidget {
 
             /// if in ---SUCCESS--- state, then show message
             success: (_, __, message) {
-          print('Success state emitted');
           LoadingScreen.instance().hide();
           message != null
               ? ScaffoldMessenger.of(context)
@@ -169,25 +165,15 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  late final bool isSignedIn;
-
   @override
   void initState() {
     super.initState();
 
-    final jsonUser = Hive.box("users_box").get("user");
     context.read<AuthCubit>().initialiseFromLocalStorage();
-    User user = User.fromJson(jsonUser);
-    isSignedIn = user.signedIn ?? false;
-
-    print(
-        'splashScreen initState: the user is signed in: $isSignedIn, user state: ${context.read<AuthCubit>().state.toString()}');
   }
 
   @override
   Widget build(BuildContext context) {
-    print(
-        'Splashscreen before selection of HomeScreen or SignIn Screen isSignedIn: $isSignedIn');
-    return isSignedIn ? const HomeScreen() : const SignInScreen();
+    return const SignInScreen();
   }
 }
