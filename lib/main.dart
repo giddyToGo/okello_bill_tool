@@ -79,18 +79,27 @@ class MyApp extends StatelessWidget {
       },
       home: BlocListener<AuthCubit, AuthState1>(
           listener: (context, state) {
+            print(
+                '-------------------------------------------------current state is $state');
+
+            /// If in ---LOADING--- state, then show loading screen with message or 'Loading...'
             state.maybeWhen(loading: (__, _, message) {
               LoadingScreen.instance().show(
                 context: context,
                 text: message ?? 'Loading... ',
               );
             }, error: (_, authError) {
+              /// if in ---ERROR--- state then show error screen with dialog.
+
               LoadingScreen.instance().hide();
               showAuthError(
                 authError: authError,
                 context: context,
               );
-            }, content: (_, __, message) {
+            },
+
+                /// If in ---CONTENT--- state, then show message and navigate to Home Screen
+                content: (user, __, message) {
               LoadingScreen.instance().hide();
               message != null
                   ? ScaffoldMessenger.of(context)
@@ -98,6 +107,7 @@ class MyApp extends StatelessWidget {
                   : null;
               Navigator.pushNamed(context, HomeScreen.id);
             }, initial: (user, __, message) {
+              /// If in ---INITIAL--- state, then show message. if user.signedIn then show homescreen
               LoadingScreen.instance().hide();
               bool signedIn = user.signedIn ?? false;
               !signedIn ? Navigator.pushNamed(context, SignInScreen.id) : null;
@@ -106,6 +116,7 @@ class MyApp extends StatelessWidget {
                       .showSnackBar(SnackBar(content: Text(message.toString())))
                   : null;
             }, success: (_, __, message) {
+              /// if in SUCCESS state, then show message
               LoadingScreen.instance().hide();
               message != null
                   ? ScaffoldMessenger.of(context)
@@ -115,19 +126,35 @@ class MyApp extends StatelessWidget {
               LoadingScreen.instance().hide();
             });
           },
-          child: BlocListener<InternetCubit, InternetState>(
-            listener: (context, state) {
-              if (state is InternetDisconnected) {
-                LoadingScreen.instance().show(
-                  context: context,
-                  text: 'Internet is down, please reconnect',
-                );
-              } else if (state is InternetConnected) {
-                LoadingScreen.instance().hide();
-              }
-            },
-            child: const SplashScreen(),
-          )),
+          child: BlocConsumer<InternetCubit, InternetState>(
+              listener: (context, state) {
+            print(
+                '-------------------------------------------------InternetCubit Listener heard a state of $state');
+            if (state is InternetDisconnected) {
+              // LoadingScreen.instance().show(
+              //   context: context,
+              //   text: 'Internet is down, please reconnect',
+              // );
+            } else if (state is InternetConnected) {
+              LoadingScreen.instance().hide();
+            }
+          }, builder: (context, state) {
+            return SafeArea(
+              child: Scaffold(
+                  body: Column(
+                children: [
+                  if (state is InternetDisconnected)
+                    Container(
+                      color: Colors.red,
+                      height: 40,
+                      width: double.infinity,
+                      child: const Text("Please connect !!!"),
+                    ),
+                  const Expanded(child: SplashScreen()),
+                ],
+              )),
+            );
+          })),
     ));
   }
 }
@@ -148,6 +175,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
     final jsonUser = Hive.box("users_box").get("user");
     context.read<AuthCubit>().initialiseFromLocalStorage();
+
+    /// this breaks ability to show/hide no internet banner. bug here somewhere?
     User user = User.fromJson(jsonUser);
     isSignedIn = user.signedIn ?? false;
   }

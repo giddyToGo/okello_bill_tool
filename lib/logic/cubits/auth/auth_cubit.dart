@@ -16,12 +16,21 @@ class AuthCubit extends Cubit<AuthState1> {
   AuthRepository authMethods = AuthRepository();
 
   void initialiseFromLocalStorage() {
+    print(
+        '--------------------------------------about to try and initialise from local storage');
     try {
+      print(
+          ' --------------------------------------------initialising from local storage. should emit initial state after this ');
       final usersBox = Hive.box("users_box");
       final jsonUser = Hive.box("users_box").get("user");
       final User user = User.fromJson(jsonUser);
-      emit(AuthState1.initial(user, null,
-          "Found user in local storage. User signed in? ${user.signedIn}"));
+
+      /// -------------------------------- the below emit state is breaking ability to show no internet banner.
+      /// I imagine this was the bug that was breaking everything else too.
+
+
+      // emit(AuthState1.initial(user, null,
+      //     "Found user in local storage. User signed in? ${user.signedIn}"));
     } catch (e) {
       rethrow;
     }
@@ -74,10 +83,12 @@ class AuthCubit extends Cubit<AuthState1> {
 
       bool existingUser = await authMethods.checkForExistingUser(email: email);
 
-
       emit(AuthState1.success(
-          state.user, null, existingUser ?
-      "A user with this email exists" : "No user exists with this email"));
+          state.user,
+          null,
+          existingUser
+              ? "A user with this email exists"
+              : "No user exists with this email"));
 
       return;
     } catch (e) {
