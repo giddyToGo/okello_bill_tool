@@ -183,7 +183,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // context.read<AuthCubit>().initialiseUser();
+    context.read<AuthCubit>().initialiseUser();
     // print(
     //     '-----------------------------initialised splashscreen, user is:  ${context.read<AuthCubit>().state.user.email}');
 
