@@ -1,3 +1,4 @@
+import 'package:okello_bill_tool/main.dart';
 import 'package:okello_bill_tool/screens/user_profile_screen.dart';
 
 import '../logic/cubits/auth/auth_cubit.dart';
@@ -24,6 +25,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // print(
+    //     '---------initialised homeScreen, user is:  ${context.read<AuthCubit>().state.user.email}');
+  }
+
   void snackBar(String text) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
   }
@@ -38,14 +46,17 @@ class _HomeScreenState extends State<HomeScreen> {
     var state = context.read<AuthCubit>().state;
 
     final user = context.watch<AuthCubit>().state.user;
-    final profilePic = user.profilePic;
+    final profilePic = user.photoURL;
+
+    // print(
+    //     '-----------------------------built homeScreen, user is:  ${context.read<AuthCubit>().state.user.email}');
 
     return Scaffold(
       body: BlocListener<AuthCubit, AuthState1>(
         listener: (context, state) {
           final isSuccess = state.maybeWhen(
               content: (_, error, message) => true, orElse: () => false);
-          if (isSuccess) Navigator.pushNamed(context, HomeScreen.id);
+          if (isSuccess) navigatorKey.currentState!.pushNamed(HomeScreen.id);
         },
         child: ListView(children: <Widget>[
           Container(
@@ -196,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   )),
                 ),
                 onPressed: () {
-                  Navigator.pushNamed(context, UserProfileScreen.id);
+                  navigatorKey.currentState!.pushNamed(UserProfileScreen.id);
                 },
                 child: const Padding(
                   padding: EdgeInsets.symmetric(vertical: 5),
@@ -249,11 +260,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 enabledBorder: const UnderlineInputBorder(
                   borderSide: const BorderSide(color: kUnderlineColor),
                 ),
-                labelText: ' photoUrl: ${user.profilePic}',
+                labelText: ' photoUrl: ${user.photoURL}',
                 labelStyle: TextStyle(color: Colors.grey[700], fontSize: 10)),
           ),
           profilePic != null && profilePic != ''
-              ? Image.network("${user.profilePic}".toString())
+              ? Image.network("${user.photoURL}".toString())
               : Text(
                   'photo is null(${profilePic == null ? true : false}) or empty (${profilePic == '' ? true : false})')
         ]),

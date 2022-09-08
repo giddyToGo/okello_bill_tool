@@ -1,19 +1,19 @@
 import 'dart:convert';
 
-
 enum SignUpOption { emailPassword, google, twitter, facebook }
 
 class User {
   final String email;
-  String? phone, name, profilePic, uid;
+  String? phone, name, photoURL, uid;
   final SignUpOption signUpOption;
   final bool? signedIn;
 
-  User({required this.email,
+  User({
+    required this.email,
     required this.uid,
     this.name,
     this.phone,
-    this.profilePic,
+    this.photoURL,
     this.signUpOption = SignUpOption.emailPassword,
     this.signedIn,
   });
@@ -21,44 +21,53 @@ class User {
   User.empty() : this(email: "", uid: "");
 
   User copyWith({
+    String? uid,
     String? name,
     String? email,
     String? phone,
-    String? profilePic,
+    String? photoURL,
     bool? signedIn,
     signUpOption,
-
   }) {
     return User(
       name: name ?? this.name,
       email: email ?? this.email,
       phone: phone ?? this.phone,
-      profilePic: profilePic ?? this.profilePic,
+      photoURL: photoURL ?? this.photoURL,
       signUpOption: signUpOption ?? this.signUpOption,
       signedIn: signedIn ?? this.signedIn,
       uid: uid,
     );
   }
 
-  // changeImageUrl({required String imageUrl}) {
-  //   profilePic = imageUrl;
-  // }
-
   User.signedUpWithGoogle()
       : email = "",
         phone = "",
         signUpOption = SignUpOption.google,
         name = "",
-        profilePic = "",
+        photoURL = "",
         uid = "",
         signedIn = true;
+
+  String toJsonFromFirestore(Map data) {
+    final userMap = {
+      "name": name,
+      "email": email,
+      "phone": phone,
+      "photoURL": photoURL,
+      "signUpOption": signUpOption.name,
+      "uid": uid,
+      "signedIn": signedIn,
+    };
+    return jsonEncode(userMap);
+  }
 
   String toJson() {
     final userMap = {
       "name": name,
       "email": email,
       "phone": phone,
-      "imageURL": profilePic,
+      "photoURL": photoURL,
       "signUpOption": signUpOption.name,
       "uid": uid,
       "signedIn": signedIn,
@@ -71,7 +80,7 @@ class User {
     return User(
         email: decoded["email"] ?? "email address",
         phone: decoded["phone"],
-        profilePic: decoded["imageURL"],
+        photoURL: decoded["photoURL"],
         name: decoded["name"],
         signUpOption: convertToSignUpOption(decoded["signUpOption"],
             uid: decoded["uid"] ?? "User.fromJson failed to grab uid"),

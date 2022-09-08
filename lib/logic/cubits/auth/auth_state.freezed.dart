@@ -21,7 +21,8 @@ mixin _$AuthState1 {
   TResult when<TResult extends Object?>({
     required TResult Function(User user, AuthError? authError, String? message)
         loading,
-    required TResult Function(User user, AuthError authError) error,
+    required TResult Function(User user, AuthError authError, bool? showError)
+        error,
     required TResult Function(User user, AuthError? authError, String? message)
         initial,
     required TResult Function(User user, AuthError? authError, String? message)
@@ -33,7 +34,7 @@ mixin _$AuthState1 {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function(User user, AuthError? authError, String? message)? loading,
-    TResult Function(User user, AuthError authError)? error,
+    TResult Function(User user, AuthError authError, bool? showError)? error,
     TResult Function(User user, AuthError? authError, String? message)? initial,
     TResult Function(User user, AuthError? authError, String? message)? content,
     TResult Function(User user, AuthError? authError, String? message)? success,
@@ -42,7 +43,7 @@ mixin _$AuthState1 {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(User user, AuthError? authError, String? message)? loading,
-    TResult Function(User user, AuthError authError)? error,
+    TResult Function(User user, AuthError authError, bool? showError)? error,
     TResult Function(User user, AuthError? authError, String? message)? initial,
     TResult Function(User user, AuthError? authError, String? message)? content,
     TResult Function(User user, AuthError? authError, String? message)? success,
@@ -197,7 +198,8 @@ class _$_Loading implements _Loading {
   TResult when<TResult extends Object?>({
     required TResult Function(User user, AuthError? authError, String? message)
         loading,
-    required TResult Function(User user, AuthError authError) error,
+    required TResult Function(User user, AuthError authError, bool? showError)
+        error,
     required TResult Function(User user, AuthError? authError, String? message)
         initial,
     required TResult Function(User user, AuthError? authError, String? message)
@@ -212,7 +214,7 @@ class _$_Loading implements _Loading {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function(User user, AuthError? authError, String? message)? loading,
-    TResult Function(User user, AuthError authError)? error,
+    TResult Function(User user, AuthError authError, bool? showError)? error,
     TResult Function(User user, AuthError? authError, String? message)? initial,
     TResult Function(User user, AuthError? authError, String? message)? content,
     TResult Function(User user, AuthError? authError, String? message)? success,
@@ -224,7 +226,7 @@ class _$_Loading implements _Loading {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(User user, AuthError? authError, String? message)? loading,
-    TResult Function(User user, AuthError authError)? error,
+    TResult Function(User user, AuthError authError, bool? showError)? error,
     TResult Function(User user, AuthError? authError, String? message)? initial,
     TResult Function(User user, AuthError? authError, String? message)? content,
     TResult Function(User user, AuthError? authError, String? message)? success,
@@ -296,7 +298,7 @@ abstract class _$$_ErrorCopyWith<$Res> implements $AuthState1CopyWith<$Res> {
   factory _$$_ErrorCopyWith(_$_Error value, $Res Function(_$_Error) then) =
       __$$_ErrorCopyWithImpl<$Res>;
   @override
-  $Res call({User user, AuthError authError});
+  $Res call({User user, AuthError authError, bool? showError});
 }
 
 /// @nodoc
@@ -312,6 +314,7 @@ class __$$_ErrorCopyWithImpl<$Res> extends _$AuthState1CopyWithImpl<$Res>
   $Res call({
     Object? user = freezed,
     Object? authError = freezed,
+    Object? showError = freezed,
   }) {
     return _then(_$_Error(
       user == freezed
@@ -322,6 +325,10 @@ class __$$_ErrorCopyWithImpl<$Res> extends _$AuthState1CopyWithImpl<$Res>
           ? _value.authError
           : authError // ignore: cast_nullable_to_non_nullable
               as AuthError,
+      showError == freezed
+          ? _value.showError
+          : showError // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ));
   }
 }
@@ -329,16 +336,18 @@ class __$$_ErrorCopyWithImpl<$Res> extends _$AuthState1CopyWithImpl<$Res>
 /// @nodoc
 
 class _$_Error implements _Error {
-  const _$_Error(this.user, this.authError);
+  const _$_Error(this.user, this.authError, [this.showError]);
 
   @override
   final User user;
   @override
   final AuthError authError;
+  @override
+  final bool? showError;
 
   @override
   String toString() {
-    return 'AuthState1.error(user: $user, authError: $authError)';
+    return 'AuthState1.error(user: $user, authError: $authError, showError: $showError)';
   }
 
   @override
@@ -347,14 +356,16 @@ class _$_Error implements _Error {
         (other.runtimeType == runtimeType &&
             other is _$_Error &&
             const DeepCollectionEquality().equals(other.user, user) &&
-            const DeepCollectionEquality().equals(other.authError, authError));
+            const DeepCollectionEquality().equals(other.authError, authError) &&
+            const DeepCollectionEquality().equals(other.showError, showError));
   }
 
   @override
   int get hashCode => Object.hash(
       runtimeType,
       const DeepCollectionEquality().hash(user),
-      const DeepCollectionEquality().hash(authError));
+      const DeepCollectionEquality().hash(authError),
+      const DeepCollectionEquality().hash(showError));
 
   @JsonKey(ignore: true)
   @override
@@ -366,7 +377,8 @@ class _$_Error implements _Error {
   TResult when<TResult extends Object?>({
     required TResult Function(User user, AuthError? authError, String? message)
         loading,
-    required TResult Function(User user, AuthError authError) error,
+    required TResult Function(User user, AuthError authError, bool? showError)
+        error,
     required TResult Function(User user, AuthError? authError, String? message)
         initial,
     required TResult Function(User user, AuthError? authError, String? message)
@@ -374,33 +386,33 @@ class _$_Error implements _Error {
     required TResult Function(User user, AuthError? authError, String? message)
         success,
   }) {
-    return error(user, authError);
+    return error(user, authError, showError);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function(User user, AuthError? authError, String? message)? loading,
-    TResult Function(User user, AuthError authError)? error,
+    TResult Function(User user, AuthError authError, bool? showError)? error,
     TResult Function(User user, AuthError? authError, String? message)? initial,
     TResult Function(User user, AuthError? authError, String? message)? content,
     TResult Function(User user, AuthError? authError, String? message)? success,
   }) {
-    return error?.call(user, authError);
+    return error?.call(user, authError, showError);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(User user, AuthError? authError, String? message)? loading,
-    TResult Function(User user, AuthError authError)? error,
+    TResult Function(User user, AuthError authError, bool? showError)? error,
     TResult Function(User user, AuthError? authError, String? message)? initial,
     TResult Function(User user, AuthError? authError, String? message)? content,
     TResult Function(User user, AuthError? authError, String? message)? success,
     required TResult orElse(),
   }) {
     if (error != null) {
-      return error(user, authError);
+      return error(user, authError, showError);
     }
     return orElse();
   }
@@ -447,11 +459,13 @@ class _$_Error implements _Error {
 }
 
 abstract class _Error implements AuthState1 {
-  const factory _Error(final User user, final AuthError authError) = _$_Error;
+  const factory _Error(final User user, final AuthError authError,
+      [final bool? showError]) = _$_Error;
 
   @override
   User get user;
   AuthError get authError;
+  bool? get showError;
   @override
   @JsonKey(ignore: true)
   _$$_ErrorCopyWith<_$_Error> get copyWith =>
@@ -543,7 +557,8 @@ class _$_Initial implements _Initial {
   TResult when<TResult extends Object?>({
     required TResult Function(User user, AuthError? authError, String? message)
         loading,
-    required TResult Function(User user, AuthError authError) error,
+    required TResult Function(User user, AuthError authError, bool? showError)
+        error,
     required TResult Function(User user, AuthError? authError, String? message)
         initial,
     required TResult Function(User user, AuthError? authError, String? message)
@@ -558,7 +573,7 @@ class _$_Initial implements _Initial {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function(User user, AuthError? authError, String? message)? loading,
-    TResult Function(User user, AuthError authError)? error,
+    TResult Function(User user, AuthError authError, bool? showError)? error,
     TResult Function(User user, AuthError? authError, String? message)? initial,
     TResult Function(User user, AuthError? authError, String? message)? content,
     TResult Function(User user, AuthError? authError, String? message)? success,
@@ -570,7 +585,7 @@ class _$_Initial implements _Initial {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(User user, AuthError? authError, String? message)? loading,
-    TResult Function(User user, AuthError authError)? error,
+    TResult Function(User user, AuthError authError, bool? showError)? error,
     TResult Function(User user, AuthError? authError, String? message)? initial,
     TResult Function(User user, AuthError? authError, String? message)? content,
     TResult Function(User user, AuthError? authError, String? message)? success,
@@ -722,7 +737,8 @@ class _$_Content implements _Content {
   TResult when<TResult extends Object?>({
     required TResult Function(User user, AuthError? authError, String? message)
         loading,
-    required TResult Function(User user, AuthError authError) error,
+    required TResult Function(User user, AuthError authError, bool? showError)
+        error,
     required TResult Function(User user, AuthError? authError, String? message)
         initial,
     required TResult Function(User user, AuthError? authError, String? message)
@@ -737,7 +753,7 @@ class _$_Content implements _Content {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function(User user, AuthError? authError, String? message)? loading,
-    TResult Function(User user, AuthError authError)? error,
+    TResult Function(User user, AuthError authError, bool? showError)? error,
     TResult Function(User user, AuthError? authError, String? message)? initial,
     TResult Function(User user, AuthError? authError, String? message)? content,
     TResult Function(User user, AuthError? authError, String? message)? success,
@@ -749,7 +765,7 @@ class _$_Content implements _Content {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(User user, AuthError? authError, String? message)? loading,
-    TResult Function(User user, AuthError authError)? error,
+    TResult Function(User user, AuthError authError, bool? showError)? error,
     TResult Function(User user, AuthError? authError, String? message)? initial,
     TResult Function(User user, AuthError? authError, String? message)? content,
     TResult Function(User user, AuthError? authError, String? message)? success,
@@ -901,7 +917,8 @@ class _$_Success implements _Success {
   TResult when<TResult extends Object?>({
     required TResult Function(User user, AuthError? authError, String? message)
         loading,
-    required TResult Function(User user, AuthError authError) error,
+    required TResult Function(User user, AuthError authError, bool? showError)
+        error,
     required TResult Function(User user, AuthError? authError, String? message)
         initial,
     required TResult Function(User user, AuthError? authError, String? message)
@@ -916,7 +933,7 @@ class _$_Success implements _Success {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function(User user, AuthError? authError, String? message)? loading,
-    TResult Function(User user, AuthError authError)? error,
+    TResult Function(User user, AuthError authError, bool? showError)? error,
     TResult Function(User user, AuthError? authError, String? message)? initial,
     TResult Function(User user, AuthError? authError, String? message)? content,
     TResult Function(User user, AuthError? authError, String? message)? success,
@@ -928,7 +945,7 @@ class _$_Success implements _Success {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(User user, AuthError? authError, String? message)? loading,
-    TResult Function(User user, AuthError authError)? error,
+    TResult Function(User user, AuthError authError, bool? showError)? error,
     TResult Function(User user, AuthError? authError, String? message)? initial,
     TResult Function(User user, AuthError? authError, String? message)? content,
     TResult Function(User user, AuthError? authError, String? message)? success,

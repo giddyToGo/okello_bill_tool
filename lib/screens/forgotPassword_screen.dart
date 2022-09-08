@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:okello_bill_tool/screens/signIn_screen.dart';
 
 import '../logic/cubits/auth/auth_cubit.dart';
+import '../main.dart';
 import '../repositories//firebase_auth_methods.dart';
 import 'source.dart';
 
@@ -25,7 +26,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     try {
       final message = await authMethods.forgottenPassword(email: email);
       snackBar(message!);
-      Navigator.pushNamed(context, SignInScreen.id);
+      navigatorKey.currentState!.pushNamed(SignInScreen.id);
     } on FirebaseAuthException catch (e) {
       snackBar(e.toString());
     }
@@ -139,7 +140,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                   await context
                                       .read<AuthCubit>()
                                       .authResetPassword(email: email);
-                                  Navigator.pushNamed(context, SignInScreen.id);
+                                  navigatorKey.currentState!
+                                      .pushNamed(SignInScreen.id);
                                 },
                                 child: const Padding(
                                   padding: EdgeInsets.symmetric(vertical: 5),
@@ -162,7 +164,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   Center(
                     child: GestureDetector(
                       onTap: () {
-                        Navigator.pushNamed(context, SignInScreen.id);
+                        navigatorKey.currentState!.pop();
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,

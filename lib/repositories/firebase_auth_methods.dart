@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:firebase_storage/firebase_storage.dart';
@@ -34,17 +36,27 @@ class AuthRepository {
   //todo implement update details
 // Update User Details in Firebase and then local storage
   Future<void> updateUserDetails(User user) async {
-    print('about to start updating info. ${user.profilePic}');
-    await _auth.currentUser?.updatePhotoURL(user.profilePic);
-    await _auth.currentUser?.updateDisplayName(user.name);
-    await _auth.currentUser?.updateEmail(user.email);
-
-    auth.User? newUser = _auth.currentUser;
     print(
-        'updated info from firebaseauthMethods. name: ${newUser?.displayName}, ---- email: ${newUser?.email}, ----- photoUrl: ${newUser?.photoURL} ');
-    // await _auth.currentUser?.updatePassword(newPassword);
-    // await _auth.currentUser?.updatePhoneNumber(user.phone);
-    return;
+        '-----------------------------------------about to start updating info. photoURL:  ${user.photoURL}');
+    try {
+      await _auth.currentUser?.updatePhotoURL(user.photoURL);
+      await _auth.currentUser?.updateDisplayName(user.name);
+      await _auth.currentUser?.updateEmail(user.email);
+
+      // save details in the database
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(user.uid)
+          .update(jsonDecode(user.toJson()));
+      auth.User? newUser = _auth.currentUser;
+
+      print(
+          'updated info from firebaseauthMethods. name: ${newUser?.displayName}, ---- email: ${newUser?.email}, ----- photoUrl: ${newUser?.photoURL} ');
+      // await _auth.currentUser?.updatePassword(newPassword);
+      // await _auth.currentUser?.updatePhoneNumber(user.phone);
+    } on auth.FirebaseAuthException catch (e) {
+      throw e.code;
+    }
   }
 
   // returns a list of sign in options for that email address
@@ -78,7 +90,7 @@ class AuthRepository {
       return User(
           email: email,
           name: credential.user!.displayName,
-          profilePic: credential.user!.photoURL,
+          photoURL: credential.user!.photoURL,
           signUpOption: SignUpOption.emailPassword,
           uid: credential.user!.uid,
           signedIn: true);
@@ -110,10 +122,11 @@ class AuthRepository {
     return User(
         email: email,
         name: firebaseUser?.displayName,
-        profilePic: firebaseUser?.photoURL,
+        photoURL: firebaseUser?.photoURL,
         phone: firebaseUser?.phoneNumber,
         uid: firebaseUser?.uid,
-        signedIn: true);
+        signedIn: true,
+        signUpOption: SignUpOption.emailPassword);
   }
 
 // Sign In With Google
@@ -128,10 +141,11 @@ class AuthRepository {
         return User(
             email: firebaseUser!.email!,
             phone: firebaseUser.phoneNumber,
-            profilePic: firebaseUser.photoURL,
+            photoURL: firebaseUser.photoURL,
             name: firebaseUser.displayName,
             uid: firebaseUser.uid,
-            signedIn: true);
+            signedIn: true,
+            signUpOption: SignUpOption.google);
       } else {
         final GoogleSignInAccount? googleSignInAccount =
             await GoogleSignIn(scopes: <String>["email"]).signIn();
@@ -148,10 +162,11 @@ class AuthRepository {
         return User(
             email: firebaseUser!.email!,
             phone: firebaseUser.phoneNumber,
-            profilePic: firebaseUser.photoURL,
+            photoURL: firebaseUser.photoURL,
             name: firebaseUser.displayName,
             uid: firebaseUser.uid,
-            signedIn: true);
+            signedIn: true,
+            signUpOption: SignUpOption.google);
       }
     } on auth.FirebaseAuthException {
       rethrow;
@@ -175,12 +190,13 @@ class AuthRepository {
       return User(
           email: firebaseUser!.email!,
           phone: firebaseUser.phoneNumber,
-          profilePic: existingImage
+          photoURL: existingImage
               ? firebaseUser.photoURL
               : facebookUser["picture"]["data"]["url"],
           name: firebaseUser.displayName,
           uid: firebaseUser.uid,
-          signedIn: true);
+          signedIn: true,
+          signUpOption: SignUpOption.facebook);
 
       // return 'Signed in successfully with Facebook';
     } on auth.FirebaseAuthException {
@@ -209,10 +225,11 @@ class AuthRepository {
           return User(
               email: firebaseUser!.email!,
               phone: firebaseUser.phoneNumber,
-              profilePic: firebaseUser.photoURL,
+              photoURL: firebaseUser.photoURL,
               name: firebaseUser.displayName,
               uid: firebaseUser.uid,
-              signedIn: true);
+              signedIn: true,
+              signUpOption: SignUpOption.twitter);
 
         case TwitterLoginStatus.cancelledByUser:
           break;
@@ -253,7 +270,6 @@ class AuthRepository {
       await GoogleSignIn().signOut();
 
       _auth.signOut();
-      return;
     } on auth.FirebaseAuthException {
       rethrow;
     }
@@ -269,5 +285,33 @@ class AuthRepository {
     final snapshot = await uploadTask.whenComplete(() => {});
     final urlDownload = await snapshot.ref.getDownloadURL();
     return urlDownload;
+  }
+
+  //delete this if everything is sweet
+  // Future<void> updateFirestoreUser(User user) async {
+  //   await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+  //     'name': user.name,
+  //     'email': user.email,
+  //     'photoURL': user.photoURL,
+  //     'phone': user.phone,
+  //     'signedIn': user.signedIn,
+  //     'signUpOption': user.signUpOption.name,
+  //   }, SetOptions(merge: true));
+  // }
+
+  Future<dynamic> getFireStoreUser(String uid) async {
+    print('uid from getFireStoreUser: ----------------$uid');
+
+    final docRef = FirebaseFirestore.instance.collection('users').doc(uid);
+
+    await docRef.get().then((DocumentSnapshot doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      print(
+          '-----------------------------------printing Data from getFireStoreUser: $data');
+      return data;
+    }, onError: (e) {
+      print('---------------------returning empty user from getFireStoreUser');
+      return User.empty();
+    });
   }
 }

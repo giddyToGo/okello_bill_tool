@@ -19,7 +19,8 @@ class AuthState1 with _$AuthState1 {
   const factory AuthState1.loading(User user,
       [AuthError? authError, String? message]) = _Loading;
 
-  const factory AuthState1.error(User user, AuthError authError) = _Error;
+  const factory AuthState1.error(User user, AuthError authError,
+      [bool? showError]) = _Error;
 
   const factory AuthState1.initial(User user,
       [AuthError? authError, String? message]) = _Initial;

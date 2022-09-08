@@ -1,6 +1,7 @@
 import 'package:okello_bill_tool/screens/signIn_screen.dart';
 
 import '../logic/cubits/auth/auth_cubit.dart';
+import '../main.dart';
 import '../repositories/firebase_auth_methods.dart';
 import 'source.dart';
 
@@ -13,13 +14,17 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  initState() {
+    authCubit = BlocProvider.of<AuthCubit>(context);
+  }
+
   String email = '';
   String password = '';
   bool _obscureText = true;
   IconData _iconVisible = Icons.visibility_off;
 
+  late AuthCubit authCubit;
   final authMethods = AuthRepository();
-  AuthCubit authCubit = AuthCubit();
 
   void _toggleObscureText() {
     setState(() {
@@ -245,7 +250,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           style: TextStyle(color: Colors.grey[700])),
                       GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(context, SignInScreen.id);
+                          navigatorKey.currentState!.pushNamed(SignInScreen.id);
                         },
                         child: const Text(
                           'Sign In',

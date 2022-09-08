@@ -4,6 +4,7 @@ import 'package:okello_bill_tool/screens/signUp_screen.dart';
 
 import '../dialogs/show_auth_error.dart';
 import '../logic/cubits/auth/auth_cubit.dart';
+import '../main.dart';
 import '../repositories/firebase_auth_methods.dart';
 import 'source.dart';
 
@@ -48,8 +49,6 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: AnnotatedRegion<SystemUiOverlayStyle>(
@@ -155,8 +154,8 @@ class _SignInScreenState extends State<SignInScreen> {
                             alignment: Alignment.centerRight,
                             child: GestureDetector(
                               onTap: () {
-                                Navigator.pushNamed(
-                                    context, ForgotPasswordScreen.id);
+                                navigatorKey.currentState!
+                                    .pushNamed(ForgotPasswordScreen.id);
                               },
                               child: const Text(
                                 'Forgot Password?',
@@ -295,7 +294,8 @@ class _SignInScreenState extends State<SignInScreen> {
                             style: TextStyle(color: Colors.grey[700])),
                         GestureDetector(
                           onTap: () {
-                            Navigator.pushNamed(context, SignUpScreen.id);
+                            navigatorKey.currentState!
+                                .pushNamed(SignUpScreen.id);
                           },
                           child: const Text(
                             'Sign Up',

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../logic/cubits/auth/auth_cubit.dart';
+import '../main.dart';
 import 'source.dart';
 
 const defaultImage =
@@ -43,6 +44,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthCubit>().state.user;
+    print(user.name);
 
     double topHeight = MediaQuery.of(context).size.height / 3;
     if (kIsWeb) {
@@ -71,7 +73,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   children: <Widget>[
                     GestureDetector(
                         onTap: () {
-                          Navigator.of(context, rootNavigator: true).pop();
+                          navigatorKey.currentState!.pop();
                         },
                         child:
                             const Icon(Icons.arrow_back, color: Colors.white)),
@@ -114,7 +116,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             radius:
                                 (MediaQuery.of(context).size.width / 5.5) - 4,
                             backgroundImage: Image.network(
-                                    user.profilePic ?? defaultImage,
+                                    user.photoURL ?? defaultImage,
                                     fit: BoxFit.fill)
                                 .image,
                             //   child: Image.network(profilePic, fit: BoxFit.fill),
@@ -323,7 +325,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget _buildCancelButton() {
     return TextButton(
         onPressed: () {
-          Navigator.pop(context);
+          navigatorKey.currentState!.pop(context);
         },
         child: const Text('No', style: TextStyle(color: Colors.blue)));
   }
@@ -335,7 +337,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
     return TextButton(
       onPressed: () async {
-        Navigator.pop(context);
+        navigatorKey.currentState!.pop(context);
         final XFile? image = await picker.pickImage(
           source: ImageSource.gallery,
         );

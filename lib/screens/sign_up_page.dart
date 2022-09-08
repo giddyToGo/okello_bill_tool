@@ -269,7 +269,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           style: TextStyle(color: Colors.grey[700])),
                       GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(context, SignInScreen.id);
+                          Navigator.of(context).pushNamed(SignInScreen.id);
                         },
                         child: const Text(
                           'Sign In',
