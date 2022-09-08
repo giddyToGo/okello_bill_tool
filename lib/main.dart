@@ -180,34 +180,21 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  bool isSignedIn = false;
+
   @override
   void initState() {
     super.initState();
-    // context.read<AuthCubit>().initialiseUser();
-    // print(
-    //     '-----------------------------initialised splashscreen, user is:  ${context.read<AuthCubit>().state.user.email}');
-
-    /// so this line sets the initState for Splashscreen to the current state?
+    final user = Hive.box("users_box").get("user") as String?;
+    if (user != null) {
+      isSignedIn = true;
+      context.read<AuthCubit>().initialiseUser(User.fromJson(user));
+      print(user);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    late final bool userExistsInLocalStorage;
-    final jsonUser = Hive.box("users_box").get("user");
-
-    if (jsonUser != null) {
-      User user = User.fromJson(jsonUser.toString());
-      var uuid = user.uid;
-
-      userExistsInLocalStorage = true;
-    } else {
-      userExistsInLocalStorage = false;
-    }
-
-    return Builder(builder: (context) {
-      return userExistsInLocalStorage
-          ? const HomeScreen()
-          : const SignInScreen();
-    });
+    return isSignedIn ? const HomeScreen() : const SignInScreen();
   }
 }

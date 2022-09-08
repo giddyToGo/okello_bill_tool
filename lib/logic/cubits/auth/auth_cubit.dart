@@ -48,77 +48,20 @@ class AuthCubit extends Cubit<AuthState1> {
   /// this function should take the uid from local storage, find the data in Firestore and update
   /// all the local User information to match.
   ///
-  void initialiseUser() async {
-    emit(AuthState1.loading(state.user, null, 'Initialising user...'));
-    log.severe('testing a log ');
-    final jsonUser = Hive.box("users_box").get("user");
-
-    if (jsonUser != null) {
-      print(
-          '-----------jsonUser != null from initialiseUser() user: $jsonUser');
-      try {
-        final jsonUid = User.fromJson(jsonUser).uid ?? "";
-        dynamic fireStoreData = await authMethods.getFireStoreUser(jsonUid);
-        print(
-            '---------------------------------firestore data from authmethods call in initialiseUser() cubit = $fireStoreData');
-
-        // User newUser = User(email: fireStoreData.email, uid: fireStoreData.uid);
-
-        print('////////////////////////////////////////');
-        // print('------ - newUser: $newUser');
-        print(
-            '----------------------------------------firestoreData from initialiseUser:    $fireStoreData');
-      } catch (e) {
-        {
-          if (e is SocketException) {
-            emit(AuthState1.error(state.user, const AuthErrorNoInternet()));
-          } else if (e is TimeoutException) {
-            emit(AuthState1.error(state.user, const AuthErrorNoInternet()));
-          } else if (e is FirebaseAuthException) {
-            emit(AuthState1.error(
-                state.user,
-                AuthError(
-                    dialogText: e.message ?? "Initialise User Error",
-                    dialogTitle: e.code)));
-          } else {
-            emit(AuthState1.error(
-                state.user,
-                AuthError(
-                    dialogText: e.toString(),
-                    dialogTitle: 'Initialise User Error')));
-          }
-        }
-      }
-
-      emit(AuthState1.success(
-          User.fromJson(jsonUser), null, 'Successfully initialised user...'));
-    } else {
-      emit(AuthState1.error(
-          state.user,
-          AuthError(
-              dialogTitle: 'No user in local storage',
-              dialogText: 'Please sign in.')));
-      print(
-          '----------------jsonUser must be null from initialiseUser function');
-    }
-  }
+  void initialiseUser(User user) async => emit(AuthState1.success(user));
 
   Future<void> updateUserDetails(User user) async {
-    emit(AuthState1.loading(user, null, "Updating details"));
+    emit(AuthState1.loading(state.user, null, "Updating details"));
     try {
       print('-------------user data at start of updateUserDetails cubit');
-      final usersBox = Hive.box("users_box");
-
+      /*    final usersBox = Hive.box("users_box");
       /// remember to turn this back on ------------------------------------------------------------------------------------------------
       // usersBox.put("user", user.toJson());
       final jsonUser = Hive.box("users_box").get("user");
-      // await authMethods.updateFirestoreUser(user);   -- delete if everything is sweet
+      // await authMethods.updateFirestoreUser(user);   -- delete if everything is sweet*/
       await authMethods.updateUserDetails(user);
-
-      await usersBox.put("user", user.toJson());
-
-      emit(AuthState1.success(
-          User.fromJson(jsonUser), null, "Successfully updated"));
+      await Hive.box("users_box").put("user", user.toJson());
+      emit(AuthState1.success(user, null, "Successfully updated"));
       return;
     } catch (e) {
       _handleError(e);

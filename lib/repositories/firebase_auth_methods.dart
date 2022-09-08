@@ -36,24 +36,13 @@ class AuthRepository {
   //todo implement update details
 // Update User Details in Firebase and then local storage
   Future<void> updateUserDetails(User user) async {
-    print(
-        '-----------------------------------------about to start updating info. photoURL:  ${user.photoURL}');
+    print('---------about to start updating info. photoURL:  ${user.photoURL}');
     try {
-      await _auth.currentUser?.updatePhotoURL(user.photoURL);
-      await _auth.currentUser?.updateDisplayName(user.name);
-      await _auth.currentUser?.updateEmail(user.email);
-
-      // save details in the database
+      print(user.uid);
       await FirebaseFirestore.instance
           .collection("users")
           .doc(user.uid)
           .update(jsonDecode(user.toJson()));
-      auth.User? newUser = _auth.currentUser;
-
-      print(
-          'updated info from firebaseauthMethods. name: ${newUser?.displayName}, ---- email: ${newUser?.email}, ----- photoUrl: ${newUser?.photoURL} ');
-      // await _auth.currentUser?.updatePassword(newPassword);
-      // await _auth.currentUser?.updatePhoneNumber(user.phone);
     } on auth.FirebaseAuthException catch (e) {
       throw e.code;
     }

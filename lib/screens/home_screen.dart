@@ -104,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 focusedBorder: UnderlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[600]!)),
                 enabledBorder: const UnderlineInputBorder(
-                  borderSide: const BorderSide(color: kUnderlineColor),
+                  borderSide: BorderSide(color: kUnderlineColor),
                 ),
                 labelText: 'Email',
                 labelStyle: TextStyle(color: Colors.grey[700])),
@@ -258,7 +258,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 focusedBorder: UnderlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[600]!)),
                 enabledBorder: const UnderlineInputBorder(
-                  borderSide: const BorderSide(color: kUnderlineColor),
+                  borderSide: BorderSide(color: kUnderlineColor),
                 ),
                 labelText: ' photoUrl: ${user.photoURL}',
                 labelStyle: TextStyle(color: Colors.grey[700], fontSize: 10)),
