@@ -84,14 +84,13 @@ class MyApp extends StatelessWidget {
           final canPop = navigatorKey.currentState!.canPop();
           if (canPop) {
             navigatorKey.currentState!.pop();
-            print('-----------------------888888=willpopscope was called');
           }
           return false;
         },
         child: BlocListener<AuthCubit, AuthState1>(
             listener: (context, state) {
-              print(
-                  '-------------------------------------------------current state is $state .................... CURRENT USER IS: ${state.user.email}');
+              logger.i(
+                  'current state is $state ......... current user is: ${state.user.email}');
 
               state.maybeWhen(loading: (__, _, message) {
                 /// If in ---LOADING--- state, then show loading screen with message or 'Loading...'
@@ -137,8 +136,7 @@ class MyApp extends StatelessWidget {
             },
             child: BlocConsumer<InternetCubit, InternetState>(
                 listener: (context, state) {
-              print(
-                  '-------------------------------------------------InternetCubit Listener heard a state of $state');
+              logger.i('InternetCubit Listener heard a state of $state');
             }, builder: (context, state) {
               return SafeArea(
                 child: Scaffold(
@@ -157,8 +155,6 @@ class MyApp extends StatelessWidget {
                         pages: [MaterialPage(child: SplashScreen())],
                         onGenerateRoute: generateRoutes,
                         onPopPage: (route, _) {
-                          print(
-                              "------------------------about to pop the page");
                           return false;
                         },
                       ),
@@ -180,34 +176,21 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  bool isSignedIn = false;
+
   @override
   void initState() {
     super.initState();
-    context.read<AuthCubit>().initialiseUser();
-    // print(
-    //     '-----------------------------initialised splashscreen, user is:  ${context.read<AuthCubit>().state.user.email}');
 
-    /// so this line sets the initState for Splashscreen to the current state?
+    final user = Hive.box("users_box").get("user") as String?;
+    if (user != null) {
+      isSignedIn = true;
+      context.read<AuthCubit>().initialiseUser(User.fromJson(user));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    late final bool userExistsInLocalStorage;
-    final jsonUser = Hive.box("users_box").get("user");
-
-    if (jsonUser != null) {
-      User user = User.fromJson(jsonUser.toString());
-      var uuid = user.uid;
-
-      userExistsInLocalStorage = true;
-    } else {
-      userExistsInLocalStorage = false;
-    }
-
-    return Builder(builder: (context) {
-      return userExistsInLocalStorage
-          ? const HomeScreen()
-          : const SignInScreen();
-    });
+    return isSignedIn ? const HomeScreen() : const SignInScreen();
   }
 }

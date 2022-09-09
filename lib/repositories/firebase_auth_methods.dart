@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
@@ -10,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:okello_bill_tool/models/user_model.dart';
+import 'package:okello_bill_tool/screens/source.dart';
 import 'package:twitter_login/twitter_login.dart';
 
 class AuthRepository {
@@ -36,24 +36,11 @@ class AuthRepository {
   //todo implement update details
 // Update User Details in Firebase and then local storage
   Future<void> updateUserDetails(User user) async {
-    print(
-        '-----------------------------------------about to start updating info. photoURL:  ${user.photoURL}');
     try {
-      await _auth.currentUser?.updatePhotoURL(user.photoURL);
-      await _auth.currentUser?.updateDisplayName(user.name);
-      await _auth.currentUser?.updateEmail(user.email);
-
-      // save details in the database
       await FirebaseFirestore.instance
           .collection("users")
           .doc(user.uid)
-          .update(jsonDecode(user.toJson()));
-      auth.User? newUser = _auth.currentUser;
-
-      print(
-          'updated info from firebaseauthMethods. name: ${newUser?.displayName}, ---- email: ${newUser?.email}, ----- photoUrl: ${newUser?.photoURL} ');
-      // await _auth.currentUser?.updatePassword(newPassword);
-      // await _auth.currentUser?.updatePhoneNumber(user.phone);
+          .set(jsonDecode(user.toJson()));
     } on auth.FirebaseAuthException catch (e) {
       throw e.code;
     }
@@ -63,10 +50,9 @@ class AuthRepository {
   // Future<String> checkForExistingUser({required email}) async {
   //   try {
   //     final message = await _auth.fetchSignInMethodsForEmail(email);
-  //     print('firebase fetch sign in methods $message');
   //     return message.toString();
   //   } on auth.FirebaseAuthException catch (e) {
-  //     print(e);
+  //     logger.e(e);
   //     return e.code;
   //   }
   // }
@@ -159,6 +145,7 @@ class AuthRepository {
         );
         final firebaseUser =
             (await _auth.signInWithCredential(credential)).user;
+
         return User(
             email: firebaseUser!.email!,
             phone: firebaseUser.phoneNumber,
@@ -287,31 +274,21 @@ class AuthRepository {
     return urlDownload;
   }
 
-  //delete this if everything is sweet
-  // Future<void> updateFirestoreUser(User user) async {
-  //   await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-  //     'name': user.name,
-  //     'email': user.email,
-  //     'photoURL': user.photoURL,
-  //     'phone': user.phone,
-  //     'signedIn': user.signedIn,
-  //     'signUpOption': user.signUpOption.name,
-  //   }, SetOptions(merge: true));
-  // }
+  Future<Map<String, dynamic>?> getFireStoreUser(String? uid) async {
+    try {
+      final docRef = FirebaseFirestore.instance.collection('users').doc(uid);
+      dynamic data = await docRef.get().then((DocumentSnapshot doc) async {
+        final data = doc.data() as Map<String, dynamic>;
 
-  Future<dynamic> getFireStoreUser(String uid) async {
-    print('uid from getFireStoreUser: ----------------$uid');
-
-    final docRef = FirebaseFirestore.instance.collection('users').doc(uid);
-
-    await docRef.get().then((DocumentSnapshot doc) {
-      final data = doc.data() as Map<String, dynamic>;
-      print(
-          '-----------------------------------printing Data from getFireStoreUser: $data');
+        if (data == null) {
+          return {};
+        } else {
+          return data;
+        }
+      });
       return data;
-    }, onError: (e) {
-      print('---------------------returning empty user from getFireStoreUser');
-      return User.empty();
-    });
+    } catch (e) {
+      rethrow;
+    }
   }
 }

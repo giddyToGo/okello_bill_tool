@@ -32,7 +32,7 @@ dependencies:
   connectivity_plus: ^2.3.6+1
   shared_preferences: ^2.0.15
   cloud_firestore: ^3.4.5
-  logging: ^1.0.2
+  logger: ^1.1.0
 
 
 

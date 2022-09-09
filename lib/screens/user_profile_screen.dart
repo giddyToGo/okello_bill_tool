@@ -44,7 +44,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthCubit>().state.user;
-    print(user.name);
 
     double topHeight = MediaQuery.of(context).size.height / 3;
     if (kIsWeb) {

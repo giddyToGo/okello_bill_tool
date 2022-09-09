@@ -28,8 +28,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // print(
-    //     '---------initialised homeScreen, user is:  ${context.read<AuthCubit>().state.user.email}');
   }
 
   void snackBar(String text) {
@@ -47,9 +45,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final user = context.watch<AuthCubit>().state.user;
     final profilePic = user.photoURL;
-
-    // print(
-    //     '-----------------------------built homeScreen, user is:  ${context.read<AuthCubit>().state.user.email}');
 
     return Scaffold(
       body: BlocListener<AuthCubit, AuthState1>(
@@ -104,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 focusedBorder: UnderlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[600]!)),
                 enabledBorder: const UnderlineInputBorder(
-                  borderSide: const BorderSide(color: kUnderlineColor),
+                  borderSide: BorderSide(color: kUnderlineColor),
                 ),
                 labelText: 'Email',
                 labelStyle: TextStyle(color: Colors.grey[700])),
@@ -258,7 +253,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 focusedBorder: UnderlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[600]!)),
                 enabledBorder: const UnderlineInputBorder(
-                  borderSide: const BorderSide(color: kUnderlineColor),
+                  borderSide: BorderSide(color: kUnderlineColor),
                 ),
                 labelText: ' photoUrl: ${user.photoURL}',
                 labelStyle: TextStyle(color: Colors.grey[700], fontSize: 10)),

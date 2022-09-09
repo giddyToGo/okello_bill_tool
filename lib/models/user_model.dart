@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-enum SignUpOption { emailPassword, google, twitter, facebook }
+enum SignUpOption { emailPassword, google, twitter, facebook, unknown }
 
 class User {
   final String email;
@@ -21,20 +21,18 @@ class User {
   User.empty() : this(email: "", uid: "");
 
   User copyWith({
-    String? uid,
     String? name,
     String? email,
     String? phone,
     String? photoURL,
     bool? signedIn,
-    signUpOption,
   }) {
     return User(
       name: name ?? this.name,
       email: email ?? this.email,
       phone: phone ?? this.phone,
       photoURL: photoURL ?? this.photoURL,
-      signUpOption: signUpOption ?? this.signUpOption,
+      signUpOption: signUpOption,
       signedIn: signedIn ?? this.signedIn,
       uid: uid,
     );
@@ -66,7 +64,7 @@ class User {
     final userMap = {
       "name": name,
       "email": email,
-      "phone": phone,
+      "phone": phone ?? "",
       "photoURL": photoURL,
       "signUpOption": signUpOption.name,
       "uid": uid,
@@ -79,13 +77,17 @@ class User {
     final decoded = jsonDecode(userJson) as Map<String, dynamic>;
     return User(
         email: decoded["email"] ?? "email address",
-        phone: decoded["phone"],
+        phone: decoded["phone"] ?? "",
         photoURL: decoded["photoURL"],
         name: decoded["name"],
         signUpOption: convertToSignUpOption(decoded["signUpOption"],
             uid: decoded["uid"] ?? "User.fromJson failed to grab uid"),
         uid: decoded["uid"] ?? "User.fromJson failed to grab uid",
         signedIn: decoded["signedIn"]);
+
+    // signUpOption: convertToSignUpOption(decoded["signUpOption"],
+    //     uid: decoded["uid"] ?? "User.fromJson failed to grab uid"),
+    // uid: decoded["uid"] ?? "User.fromJson failed to grab uid",
   }
 
   User signOut() {

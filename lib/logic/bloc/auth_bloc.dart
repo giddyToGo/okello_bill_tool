@@ -205,8 +205,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           if (user != null) {
             final String photoUrl = user.photoURL ?? "";
             final images = await _getImages(user.uid);
-            print(
-                "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ PHOTO URL: $photoUrl");
             final String displayName = user.displayName ?? "";
             final String email = user.email ?? "";
             final phoneNumber = user.phoneNumber ?? "";
@@ -308,8 +306,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             isLoading: true,
           ),
         );
-        print('testing that printing is working on logout event');
-        stderr.writeln('print me');
 
         // log the user out
         try {
