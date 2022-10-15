@@ -9,6 +9,8 @@ const kMainColor = Color(0xFF0181cc);
 const kUnderlineColor = Color(0xFFCCCCCC);
 const Color kBlack55 = Color(0xFF555555);
 const Color kColor2 = Color(0xFF333333);
+const Color kGradient1 = Color(0xFF009de1);
+const Color kGradient2 = Color(0xFF1d71b8);
 
 const kProfilePageDetailText =
     TextStyle(fontSize: 16, color: kColor2, fontWeight: FontWeight.w600);

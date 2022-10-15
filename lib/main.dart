@@ -11,12 +11,12 @@ import 'package:okello_bill_tool/screens/home_screen.dart';
 import 'package:okello_bill_tool/screens/loading_screen.dart';
 import 'package:okello_bill_tool/screens/signIn_screen.dart';
 import 'package:okello_bill_tool/screens/source.dart';
+import 'package:okello_bill_tool/screens/splash_screen.dart';
 import 'package:okello_bill_tool/utils/routes/routes.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 
 import 'dialogs/show_auth_error.dart';
 import 'logic/cubits/auth/auth_cubit.dart';
-import 'models/user_model.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -152,7 +152,7 @@ class MyApp extends StatelessWidget {
                     Expanded(
                       child: Navigator(
                         key: navigatorKey,
-                        pages: [MaterialPage(child: SplashScreen())],
+                        pages: const [MaterialPage(child: SplashScreen())],
                         onGenerateRoute: generateRoutes,
                         onPopPage: (route, _) {
                           return false;
@@ -165,32 +165,5 @@ class MyApp extends StatelessWidget {
             })),
       ),
     ));
-  }
-}
-
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
-
-  @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  bool isSignedIn = false;
-
-  @override
-  void initState() {
-    super.initState();
-
-    final user = Hive.box("users_box").get("user") as String?;
-    if (user != null) {
-      isSignedIn = true;
-      context.read<AuthCubit>().initialiseUser(User.fromJson(user));
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return isSignedIn ? const HomeScreen() : const SignInScreen();
   }
 }

@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:hive/hive.dart';
+import 'package:okello_bill_tool/logic/cubits/internet/internet_cubit.dart';
 import 'package:okello_bill_tool/repositories/firebase_auth_methods.dart';
 import 'package:okello_bill_tool/screens/source.dart';
 
@@ -49,13 +50,51 @@ class AuthCubit extends Cubit<AuthState1> {
 
   Future<void> updateUserDetails(User user) async {
     emit(AuthState1.loading(state.user, null, "Updating details"));
+
     try {
-      logger.i(
-          'user data at start of updateUserDetails cubit: UID: ${user.uid},  NAME: ${user.name},  EMAIL: ${user.email} ');
-      await authMethods.updateUserDetails(user);
-      await Hive.box("users_box").put("user", user.toJson());
-      emit(AuthState1.success(user, null, "Successfully updated"));
-      return;
+      if (internetCubit.state.toString() == InternetDisconnected().toString()) {
+        emit(AuthState1.success(
+            user, null, "No internet, changes will update later"));
+        await authMethods.updateUserDetails(user);
+        await Hive.box("users_box").put("user", user.toJson());
+        emit(AuthState1.success(
+            user, null, "Reconnected, changes will be updated online."));
+      } else {
+        await authMethods.updateUserDetails(user);
+        await Hive.box("users_box").put("user", user.toJson());
+        emit(AuthState1.success(user, null, "Successfully updated"));
+        return;
+      }
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<void> authUploadFile({required String path}) async {
+    final user = state.user;
+    emit(AuthState1.loading(state.user, null, "Uploading your picture"));
+
+    try {
+      if (user.uid == null) throw 'User not signed in';
+      if (internetCubit.state.toString() == InternetDisconnected().toString()) {
+        emit(AuthState1.success(
+            user, null, "No internet, changes will update later"));
+        final newFilePathURL =
+            await authMethods.uploadFile(path: path, userId: user.uid);
+
+        emit(
+            AuthState1.success(state.user, null, "Successfully uploaded file"));
+        updateUserDetails(state.user);
+      } else {
+        // upload the file
+        final newProfilePicURL =
+            await authMethods.uploadFile(path: path, userId: user.uid);
+
+        // emit the new profile pic and turn off loading
+        emit(AuthState1.success(state.user.copyWith(photoURL: newProfilePicURL),
+            null, "Successfully uploaded image"));
+        updateUserDetails(state.user);
+      }
     } catch (e) {
       _handleError(e);
     }
@@ -63,23 +102,32 @@ class AuthCubit extends Cubit<AuthState1> {
 
   Future<void> authUploadImage({required String path}) async {
     final user = state.user;
+    emit(AuthState1.loading(state.user, null, "Uploading your picture"));
 
     try {
       if (user.uid == null) throw 'User not signed in';
-      // start the loading process
-      emit(AuthState1.loading(state.user, null, "Uploading your picture"));
-      // upload the file
-      final newProfilePicURL =
-          await authMethods.uploadImage(path: path, userId: user.uid);
+      if (internetCubit.state.toString() == InternetDisconnected().toString()) {
+        emit(AuthState1.success(
+            user, null, "No internet, changes will update later"));
+        final newProfilePicURL =
+            await authMethods.uploadFile(path: path, userId: user.uid);
 
-      // emit the new profile pic and turn off loading
-      emit(AuthState1.success(state.user.copyWith(photoURL: newProfilePicURL),
-          null, "Successfully uploaded image"));
-      updateUserDetails(state.user);
+        emit(AuthState1.success(state.user.copyWith(photoURL: newProfilePicURL),
+            null, "Successfully uploaded image"));
+        updateUserDetails(state.user);
+      } else {
+        // upload the file
+        final newProfilePicURL =
+            await authMethods.uploadFile(path: path, userId: user.uid);
+
+        // emit the new profile pic and turn off loading
+        emit(AuthState1.success(state.user.copyWith(photoURL: newProfilePicURL),
+            null, "Successfully uploaded image"));
+        updateUserDetails(state.user);
+      }
     } catch (e) {
       _handleError(e);
     }
-    // log user out if we don't have an actual user in app auth
   }
 
   Future<void> checkForExistingUserInFirebase({required email}) async {
@@ -194,6 +242,7 @@ class AuthCubit extends Cubit<AuthState1> {
     emit(AuthState1.loading(state.user, null, 'Deleting account'));
     try {
       await authMethods.deleteUser();
+      await Hive.box("users_box").clear();
       emit(AuthState1.initial(
           User.empty(), null, 'Successfully deleted account'));
     } catch (e) {

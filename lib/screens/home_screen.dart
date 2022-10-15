@@ -1,4 +1,7 @@
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:okello_bill_tool/main.dart';
+import 'package:okello_bill_tool/screens/sign_up_or_login.dart';
 import 'package:okello_bill_tool/screens/user_profile_screen.dart';
 
 import '../logic/cubits/auth/auth_cubit.dart';
@@ -18,7 +21,7 @@ import 'source.dart';
 class HomeScreen extends StatefulWidget {
   static const String id = 'HomeScreen';
 
-  const HomeScreen({Key? key}) : super(key: key);
+  HomeScreen({Key? key}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -29,6 +32,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
   }
+
+  final picker = ImagePicker();
 
   void snackBar(String text) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
@@ -85,6 +90,53 @@ class _HomeScreenState extends State<HomeScreen> {
                   Icon(Icons.power_settings_new, size: 20, color: Colors.black),
                   SizedBox(width: 8),
                   Text('Delete User Account',
+                      style: TextStyle(fontSize: 15, color: Colors.black)),
+                ],
+              ),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.fromLTRB(0, 18, 0, 0),
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () async {
+                Future<http.Response> test() async {
+                  logger.i('about to run http get request');
+                  final message = await http.get(Uri.parse(
+                      'https://us-central1-okello-billtool.cloudfunctions.net/helloWorld'));
+                  logger.wtf(" returned value from http get ${message.body}");
+                  return message;
+                }
+
+                test();
+              }, //todo create function to query DocumentAI
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.power_settings_new, size: 20, color: Colors.black),
+                  SizedBox(width: 8),
+                  Text('test documentAI',
+                      style: TextStyle(fontSize: 15, color: Colors.black)),
+                ],
+              ),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.fromLTRB(0, 18, 0, 0),
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SignUpOrLogin()));
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.power_settings_new, size: 20, color: Colors.black),
+                  SizedBox(width: 8),
+                  Text('SignUpOrLogin',
                       style: TextStyle(fontSize: 15, color: Colors.black)),
                 ],
               ),
@@ -169,6 +221,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   )),
                 ),
                 onPressed: () async {
+                  final XFile? image = await picker.pickImage(
+                    source: ImageSource.gallery,
+                  );
+                  if (image != null) await uploadImage(image.path);
+
+                  setState(() {});
+
                   // final image = await picker.pickImage(
                   //   source: ImageSource.gallery,);
                   //
@@ -265,5 +324,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ]),
       ),
     );
+  }
+
+  Future<void> uploadImage(String path) async {
+    await context.read<AuthCubit>().authUploadImage(path: path);
   }
 }

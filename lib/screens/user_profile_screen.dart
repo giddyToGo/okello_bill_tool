@@ -33,7 +33,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   @override
   void initState() {
     super.initState();
-    final user = context.read<AuthCubit>().state.user;
+    final user = context
+        .read<AuthCubit>()
+        .state
+        .user;
     emailController.text = user.email;
     nameController.text = user.name ?? "";
     phoneController.text = user.phone ?? "";
@@ -43,18 +46,27 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<AuthCubit>().state.user;
+    final user = context
+        .watch<AuthCubit>()
+        .state
+        .user;
 
-    double topHeight = MediaQuery.of(context).size.height / 3;
+    double topHeight = MediaQuery
+        .of(context)
+        .size
+        .height / 3;
     if (kIsWeb) {
-      topHeight = MediaQuery.of(context).size.height / 2.5;
+      topHeight = MediaQuery
+          .of(context)
+          .size
+          .height / 2.5;
     }
     return Scaffold(
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: Platform.isIOS
             ? SystemUiOverlayStyle.light
             : const SystemUiOverlayStyle(
-                statusBarIconBrightness: Brightness.light),
+            statusBarIconBrightness: Brightness.light),
         child: SingleChildScrollView(
           child: Stack(
             children: <Widget>[
@@ -75,7 +87,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           navigatorKey.currentState!.pop();
                         },
                         child:
-                            const Icon(Icons.arrow_back, color: Colors.white)),
+                        const Icon(Icons.arrow_back, color: Colors.white)),
                     GestureDetector(
                         onTap: () {
                           editEnabled = !editEnabled;
@@ -83,23 +95,29 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         },
                         child: !editEnabled
                             ? const Text('Edit',
-                                style: TextStyle(color: Colors.white))
+                            style: TextStyle(color: Colors.white))
                             : const Text('Editing...',
-                                style: TextStyle(color: Colors.white))),
+                            style: TextStyle(color: Colors.white))),
                   ],
                 ),
               ),
               Container(
                 alignment: Alignment.topCenter,
                 margin: EdgeInsets.only(
-                    top: (MediaQuery.of(context).size.height / 8)),
+                    top: (MediaQuery
+                        .of(context)
+                        .size
+                        .height / 8)),
                 child: Image.asset('assets/images/logo_horizontal.png',
                     height: 30, color: Colors.white),
               ),
               Container(
                 alignment: Alignment.topCenter,
                 margin: EdgeInsets.only(
-                    top: (topHeight) - MediaQuery.of(context).size.width / 5.5),
+                    top: (topHeight) - MediaQuery
+                        .of(context)
+                        .size
+                        .width / 5.5),
                 child: Column(
                   children: <Widget>[
                     GestureDetector(
@@ -109,14 +127,21 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       child: Stack(children: [
                         CircleAvatar(
                           backgroundColor: Colors.white,
-                          radius: MediaQuery.of(context).size.width / 5.5,
+                          radius: MediaQuery
+                              .of(context)
+                              .size
+                              .width / 5.5,
                           child: CircleAvatar(
                             backgroundColor: Colors.white,
                             radius:
-                                (MediaQuery.of(context).size.width / 5.5) - 4,
-                            backgroundImage: Image.network(
-                                    user.photoURL ?? defaultImage,
-                                    fit: BoxFit.fill)
+                            (MediaQuery
+                                .of(context)
+                                .size
+                                .width / 5.5) - 4,
+                            backgroundImage: Image
+                                .network(
+                                user.photoURL ?? defaultImage,
+                                fit: BoxFit.fill)
                                 .image,
                             //   child: Image.network(profilePic, fit: BoxFit.fill),
                           ),
@@ -126,17 +151,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           height: 30,
                           margin: EdgeInsets.only(
                               top: 0,
-                              left: MediaQuery.of(context).size.width / 4),
+                              left: MediaQuery
+                                  .of(context)
+                                  .size
+                                  .width / 4),
                           child: !editEnabled
                               ? Container()
                               : Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30),
-                                  ),
-                                  elevation: 1,
-                                  child: const Icon(Icons.edit,
-                                      size: 12, color: kBlack55),
-                                ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            elevation: 1,
+                            child: const Icon(Icons.edit,
+                                size: 12, color: kBlack55),
+                          ),
                         ),
                       ]),
                     ),
@@ -156,28 +184,28 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               if (!editEnabled)
                                 Flexible(
                                     child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(user.name ?? "",
-                                      style: kProfilePageDetailText),
-                                )),
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(user.name ?? "",
+                                          style: kProfilePageDetailText),
+                                    )),
                               if (editEnabled)
                                 Flexible(
                                     child: Container(
-                                  decoration:
+                                      decoration:
                                       BoxDecoration(border: Border.all()),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(7.0),
-                                    child: TextField(
-                                        controller: nameController,
-                                        obscureText: false,
-                                        decoration:
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(7.0),
+                                        child: TextField(
+                                            controller: nameController,
+                                            obscureText: false,
+                                            decoration:
                                             const InputDecoration.collapsed(
-                                          hintText:
+                                              hintText:
                                               'Enter your display name here',
-                                        ),
-                                        style: kProfilePageDetailText),
-                                  ),
-                                ))
+                                            ),
+                                            style: kProfilePageDetailText),
+                                      ),
+                                    ))
                             ],
                           ),
                           // const SizedBox(height: 24),
@@ -191,30 +219,30 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               if (!editEnabled)
                                 Flexible(
                                     child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: user.email != ""
-                                      ? Text(user.email,
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: user.email != ""
+                                          ? Text(user.email,
                                           style: kProfilePageDetailText)
-                                      : const Text(
+                                          : const Text(
                                           'Please update your email address'),
-                                )),
+                                    )),
                               if (editEnabled)
                                 Flexible(
                                     child: Container(
-                                  decoration:
+                                      decoration:
                                       BoxDecoration(border: Border.all()),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(7.0),
-                                    child: TextField(
-                                        controller: emailController,
-                                        obscureText: false,
-                                        decoration:
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(7.0),
+                                        child: TextField(
+                                            controller: emailController,
+                                            obscureText: false,
+                                            decoration:
                                             const InputDecoration.collapsed(
-                                          hintText: 'Enter your email here',
-                                        ),
-                                        style: kProfilePageDetailText),
-                                  ),
-                                ))
+                                              hintText: 'Enter your email here',
+                                            ),
+                                            style: kProfilePageDetailText),
+                                      ),
+                                    ))
                             ],
                           ),
                           // const SizedBox(height: 24),
@@ -232,58 +260,60 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                       padding: const EdgeInsets.all(8.0),
                                       child: user.phone != ''
                                           ? Text(user.phone ?? "",
-                                              style: kProfilePageDetailText)
+                                          style: kProfilePageDetailText)
                                           : const Text(
-                                              'Please update your phone number')),
+                                          'Please update your phone number')),
                                 ),
                               if (editEnabled)
                                 Flexible(
                                     child: Container(
-                                  decoration:
+                                      decoration:
                                       BoxDecoration(border: Border.all()),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(7.0),
-                                    child: TextField(
-                                        controller: phoneController,
-                                        enabled: editEnabled,
-                                        obscureText: false,
-                                        decoration:
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(7.0),
+                                        child: TextField(
+                                            controller: phoneController,
+                                            enabled: editEnabled,
+                                            obscureText: false,
+                                            decoration:
                                             const InputDecoration.collapsed(
-                                          hintText:
+                                              hintText:
                                               'Enter your phone number here',
-                                        ),
-                                        style: kProfilePageDetailText),
-                                  ),
-                                )),
+                                            ),
+                                            style: kProfilePageDetailText),
+                                      ),
+                                    )),
                             ],
                           ),
                           if (editEnabled)
-                            // const SizedBox(
-                            //   height: 30,
-                            // ),
+                          // const SizedBox(
+                          //   height: 30,
+                          // ),
                             if (editEnabled)
                               TextButton(
                                   style: ButtonStyle(
                                     backgroundColor: MaterialStateProperty
                                         .resolveWith<Color>(
-                                      (Set<MaterialState> states) => kMainColor,
+                                          (Set<
+                                          MaterialState> states) => kMainColor,
                                     ),
                                     overlayColor: MaterialStateProperty.all(
                                         Colors.transparent),
                                     shape: MaterialStateProperty.all(
                                         RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    )),
+                                          borderRadius: BorderRadius.circular(
+                                              10),
+                                        )),
                                   ),
                                   onPressed: () async {
                                     /// implement update user here
+                                    editEnabled = !editEnabled;
                                     await context
                                         .read<AuthCubit>()
                                         .updateUserDetails(user.copyWith(
-                                            name: nameController.text,
-                                            phone: phoneController.text,
-                                            email: emailController.text));
-                                    editEnabled = !editEnabled;
+                                        name: nameController.text,
+                                        phone: phoneController.text,
+                                        email: emailController.text));
                                     setState(() {});
                                   },
                                   child: const Padding(
@@ -311,8 +341,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   void _showAlertDialog(BuildContext context) {
     // show the dialog
     showDialog(
+        useRootNavigator: false,
         context: context,
-        builder: (_) => AlertDialog(
+        builder: (_) =>
+            AlertDialog(
               content: const Text('Edit Profile Picture ?'),
               actions: [
                 _buildCancelButton(),
@@ -324,7 +356,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget _buildCancelButton() {
     return TextButton(
         onPressed: () {
-          navigatorKey.currentState!.pop(context);
+          navigatorKey.currentState!.pop();
         },
         child: const Text('No', style: TextStyle(color: Colors.blue)));
   }
@@ -336,13 +368,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
     return TextButton(
       onPressed: () async {
+        editEnabled = !editEnabled;
         navigatorKey.currentState!.pop(context);
         final XFile? image = await picker.pickImage(
           source: ImageSource.gallery,
         );
-
         if (image != null) await uploadImage(image.path);
-        editEnabled = !editEnabled;
+
         setState(() {});
       },
       child: const Text(

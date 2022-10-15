@@ -15,12 +15,30 @@ import 'package:twitter_login/twitter_login.dart';
 class AuthRepository {
   final _auth = auth.FirebaseAuth.instance;
 
-// Check to see if User already has an account with another provider
-  // This is pointless because I can't check for existing user when they are signing in with a provider (google, facebook, twitter)...
-  // need to figure this out in the future.
   /* todo: Implement user sign in flow so that if user already has an account they are automatically linked
         and the user is signed in with the method they were trying to use.
 */
+
+// Check to see if User already has an account with another provider
+  // This is pointless because I can't check for existing user when they are signing in with a provider (google, facebook, twitter)...
+  // need to figure this out in the future.
+
+
+  Future<void> documentAI(String filepath) async {
+    final project_id = 'okello-billtool';
+    final location = 'eu';
+    final processor_id = 'a872dd2e350c9a7c';
+    final file_path = '';
+    final mime_type = 'application/pdf';
+    final apiEndpoint = 'https://eu-documentai.googleapis.com/v1/projects/186621583380/locations/eu/processors/a872dd2e350c9a7c:process';
+
+    // final httpClient = await clientViaApp
+
+
+    late final opts = {"$apiEndpoint": "$location-"};
+  }
+
+
   Future<bool> checkForExistingUser({required String email}) async {
     final list = await _auth.fetchSignInMethodsForEmail(email);
     // In case list is not empty
@@ -103,7 +121,7 @@ class AuthRepository {
   Future<User?> signInWithEmail(
       {required String email, required String password}) async {
     final firebaseUser = (await _auth.signInWithEmailAndPassword(
-            email: email, password: password))
+        email: email, password: password))
         .user;
     return User(
         email: email,
@@ -134,10 +152,10 @@ class AuthRepository {
             signUpOption: SignUpOption.google);
       } else {
         final GoogleSignInAccount? googleSignInAccount =
-            await GoogleSignIn(scopes: <String>["email"]).signIn();
+        await GoogleSignIn(scopes: <String>["email"]).signIn();
 
         final GoogleSignInAuthentication googleSignInAuthentication =
-            await googleSignInAccount!.authentication;
+        await googleSignInAccount!.authentication;
 
         final credential = GoogleAuthProvider.credential(
           accessToken: googleSignInAuthentication.accessToken,
@@ -166,7 +184,7 @@ class AuthRepository {
       final LoginResult loginResult = await FacebookAuth.instance.login();
 
       final credential =
-          auth.FacebookAuthProvider.credential(loginResult.accessToken!.token);
+      auth.FacebookAuthProvider.credential(loginResult.accessToken!.token);
 
       final firebaseUser = (await _auth.signInWithCredential(credential)).user;
       final facebookUser = await FacebookAuth.instance.getUserData();
@@ -262,10 +280,13 @@ class AuthRepository {
     }
   }
 
-  Future<String> uploadImage(
+  Future<String> uploadFile(
       {required String path, required String? userId}) async {
     final storageBucketpath =
-        '$userId/${DateTime.now().microsecondsSinceEpoch.toString()}';
+        '$userId/${DateTime
+        .now()
+        .microsecondsSinceEpoch
+        .toString()}';
 
     final ref = FirebaseStorage.instance.ref().child(storageBucketpath);
     var uploadTask = ref.putFile(File(path));
