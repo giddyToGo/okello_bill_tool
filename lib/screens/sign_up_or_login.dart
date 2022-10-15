@@ -66,7 +66,7 @@ class _SignUpOrLoginState extends State<SignUpOrLogin> {
               ClipRRect(
                   borderRadius: BorderRadius.circular(30),
                   child: Container(
-                    color: Color(0xFF484848),
+                    color: Color.fromARGB(255, 64, 12, 12),
                     child: Center(
                       child: TextButton(
                         style: TextButton.styleFrom(

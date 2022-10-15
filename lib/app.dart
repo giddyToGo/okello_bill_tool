@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:okello_bill_tool/utils/routes/routes.dart';
 
 import 'dialogs/show_auth_error.dart';
 import 'logic/cubits/auth/auth_cubit.dart';
@@ -11,7 +14,6 @@ import 'screens/loading_screen.dart';
 import 'screens/signIn_screen.dart';
 import 'screens/signUp_screen.dart';
 import 'screens/source.dart';
-import 'screens/splash_screen.dart';
 import 'screens/user_profile_screen.dart';
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
@@ -41,52 +43,73 @@ class MyApp extends StatelessWidget {
         UserSettingsScreen.id: (_) => const UserSettingsScreen(),
         ForgotPasswordScreen.id: (_) => const ForgotPasswordScreen(),
       },
-      home: BlocListener<AuthCubit, AuthState1>(
-          listener: (context, state) {
-            logger.i(
-                'current state is $state ......... current user is: ${state.user.email}');
+      home: BlocListener<AuthCubit, AuthState1>(listener: (context, state) {
+        log("state $state");
+        logger.i(
+            'current state is $state ......... current user is: ${state.user.email}');
 
-            state.maybeWhen(loading: (__, _, message) {
-              /// If in ---LOADING--- state, then show loading screen with message or 'Loading...'
-              LoadingScreen.instance().show(
-                context: context,
-                text: message ?? 'Loading... ',
-              );
-            }, error: (_, authError, showError) {
-              /// if in ---ERROR--- state then show error screen with dialog.
-              if (showError == null || showError == true) {
-                showAuthError(
-                  authError: authError,
+        state.maybeWhen(loading: (__, _, message) {
+          /// If in ---LOADING--- state, then show loading screen with message or 'Loading...'
+          LoadingScreen.instance().show(
+            context: context,
+            text: message ?? 'Loading... ',
+          );
+        }, error: (_, authError, showError) {
+          /// if in ---ERROR--- state then show error screen with dialog.
+          if (showError == null || showError == true) {
+            showAuthError(
+              authError: authError,
+              context: context,
+            );
+          }
+          LoadingScreen.instance().hide();
+        }, initial: (user, __, message) {
+          log("emitting the initial state");
+
+          /// If in ---INITIAL--- state, then show message. if user.signedIn then show homescreen
+          LoadingScreen.instance().hide();
+          navigatorKey.currentState!
+              .pushNamedAndRemoveUntil(SignInScreen.id, (_) => false);
+          message != null
+              ? ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(message.toString())))
+              : null;
+        }, content: (user, __, message) {
+          log("emitting the content state");
+
+          /// If in ---CONTENT--- state, then show message and navigate to Home Screen
+          LoadingScreen.instance().hide();
+          navigatorKey.currentState!
+              .pushNamedAndRemoveUntil(HomeScreen.id, (_) => false);
+          message != null
+              ? ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(message.toString())))
+              : null;
+        }, success: (_, __, message) {
+          /// if in SUCCESS state, then show message and no navigation
+          LoadingScreen.instance().hide();
+          message != null
+              ? ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(message.toString())))
+              : null;
+        }, orElse: () {
+          LoadingScreen.instance().hide();
+        });
+      }, child: Builder(builder: (context) {
+        return WillPopScope(
+          onWillPop: () async {
+            if (navigatorKey.currentState!.canPop()) {
+              navigatorKey.currentState!.pop();
+            } else {
+              showDialog(
                   context: context,
-                );
-              }
-              LoadingScreen.instance().hide();
-            }, initial: (user, __, message) {
-              /// If in ---INITIAL--- state, then show message. if user.signedIn then show homescreen
-              LoadingScreen.instance().hide();
-              Navigator.of(context).pushNamed(SignInScreen.id);
-              message != null
-                  ? ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text(message.toString())))
-                  : null;
-            }, content: (user, __, message) {
-              /// If in ---CONTENT--- state, then show message and navigate to Home Screen
-              LoadingScreen.instance().hide();
-              Navigator.of(context).pushNamed(HomeScreen.id);
-              message != null
-                  ? ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text(message.toString())))
-                  : null;
-            }, success: (_, __, message) {
-              /// if in SUCCESS state, then show message and no navigation
-              LoadingScreen.instance().hide();
-              message != null
-                  ? ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text(message.toString())))
-                  : null;
-            }, orElse: () {
-              LoadingScreen.instance().hide();
-            });
+                  builder: (_) {
+                    return const Dialog(
+                      child: Text("Dont close this page"),
+                    );
+                  });
+            }
+            return false;
           },
           child: BlocConsumer<InternetCubit, InternetState>(
               listener: (context, state) {
@@ -103,11 +126,20 @@ class MyApp extends StatelessWidget {
                       width: double.infinity,
                       child: const Text("Please connect !!!"),
                     ),
-                  const SplashScreen()
+                  Expanded(
+                    child: Navigator(
+                      key: navigatorKey,
+                      onGenerateRoute: generateRoutes,
+                    ),
+                  )
                 ],
               )),
             );
-          })),
+          }),
+        );
+      })),
     ));
   }
 }
+
+final navigatorKey = GlobalKey<NavigatorState>();

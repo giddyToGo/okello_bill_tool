@@ -1,13 +1,11 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:okello_bill_tool/screens/home_screen.dart';
 import 'package:okello_bill_tool/screens/signIn_screen.dart';
 import 'package:okello_bill_tool/screens/source.dart';
 
 import '../logic/cubits/auth/auth_cubit.dart';
-import '../main.dart';
 import '../models/user_model.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -18,28 +16,23 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  bool isSignedIn = false;
 
   @override
   void initState() {
     super.initState();
-
-    final user = Hive.box("users_box").get("user") as String?;
-    if (user != null) {
-      isSignedIn = true;
-      context.read<AuthCubit>().initialiseUser(User.fromJson(user));
-    }
+    final jsonUser = Hive.box("users_box").get("user") as String?;
+    context.read<AuthCubit>().initialiseUser(jsonUser);
   }
 
   @override
   Widget build(BuildContext context) {
-    Timer(Duration(seconds: 3), () {
+    /*  Timer(const Duration(seconds: 3), () {
       if (isSignedIn) {
         Navigator.of(context).pushNamed(HomeScreen.id);
       } else {
        Navigator.of(context).pushNamed(SignInScreen.id);
       }
-    });
+    });*/
 
     return Scaffold(
       body: Center(
@@ -50,8 +43,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   end: Alignment.centerRight,
                   colors: [kGradient1, kGradient2])),
           child: Center(
-            child:
-                Image.asset('assets/images/splash_logo.png'),
+            child: Image.asset('assets/images/splash_logo.png'),
           ),
         ),
       ),

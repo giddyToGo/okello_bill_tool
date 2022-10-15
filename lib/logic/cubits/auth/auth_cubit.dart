@@ -1,5 +1,6 @@
 import "dart:async";
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:hive/hive.dart';
@@ -12,8 +13,10 @@ import '../../../models/user_model.dart';
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState1> {
-  AuthCubit(this.internetCubit)
-      : super(AuthState1.initial(User.empty(), AuthError.empty()));
+  AuthCubit(this.internetCubit) : super(_initialState);
+
+  static final _initialState =
+      AuthState1.initial(User.empty(), const AuthError.empty());
 
   final usersBox = Hive.box("users_box");
   final jsonUser = Hive.box("users_box").get("user");
@@ -29,6 +32,11 @@ class AuthCubit extends Cubit<AuthState1> {
       if (e.code == "network_error") {
         internetCubit.emitInternetDisconnected();
         emit(AuthState1.error(state.user, const AuthErrorNoInternet(), false));
+      } else {
+        emit(AuthState1.error(
+            state.user,
+            AuthError(
+                dialogText: e.toString(), dialogTitle: 'An Error Happened')));
       }
     } else if (e is SocketException) {
       emit(AuthState1.error(state.user, const AuthErrorNoInternet()));
@@ -45,7 +53,13 @@ class AuthCubit extends Cubit<AuthState1> {
     }
   }
 
-  void initialiseUser(User user) async => emit(AuthState1.success(user));
+  void initialiseUser(String? jsonUser) async {
+    if (jsonUser == null) {
+      emit(_initialState);
+    } else {
+      emit(AuthState1.content(User.fromJson(jsonUser)));
+    }
+  }
 
   Future<void> updateUserDetails(User user) async {
     emit(AuthState1.loading(state.user, null, "Updating details"));
@@ -201,6 +215,7 @@ class AuthCubit extends Cubit<AuthState1> {
 
       signInDataFlow(user: user, provider: "Google");
     } catch (e) {
+      log("$e");
       _handleError(e);
     }
   }
