@@ -141,7 +141,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                       BorderSide(color: Colors.grey[600]!)),
                               enabledBorder: const UnderlineInputBorder(
                                 borderSide:
-                                    const BorderSide(color: kUnderlineColor),
+                                    BorderSide(color: kUnderlineColor),
                               ),
                               labelText: 'Password',
                               labelStyle: TextStyle(color: Colors.grey[700]),
