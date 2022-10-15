@@ -11,8 +11,6 @@ import 'package:path_provider/path_provider.dart' as path_provider;
 import 'app.dart';
 import 'logic/cubits/auth/auth_cubit.dart';
 
-final navigatorKey = GlobalKey<NavigatorState>();
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 

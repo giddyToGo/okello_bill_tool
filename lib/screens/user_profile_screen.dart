@@ -84,7 +84,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   children: <Widget>[
                     GestureDetector(
                         onTap: () {
-                          navigatorKey.currentState!.pop();
+                          Navigator.of(context).pop();
                         },
                         child:
                         const Icon(Icons.arrow_back, color: Colors.white)),
@@ -356,7 +356,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget _buildCancelButton() {
     return TextButton(
         onPressed: () {
-          navigatorKey.currentState!.pop();
+          Navigator.of(context).pop();
         },
         child: const Text('No', style: TextStyle(color: Colors.blue)));
   }
@@ -369,7 +369,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     return TextButton(
       onPressed: () async {
         editEnabled = !editEnabled;
-        navigatorKey.currentState!.pop(context);
+        Navigator.of(context).pop();
         final XFile? image = await picker.pickImage(
           source: ImageSource.gallery,
         );

@@ -154,7 +154,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             alignment: Alignment.centerRight,
                             child: GestureDetector(
                               onTap: () {
-                                navigatorKey.currentState!
+                                Navigator.of(context)
                                     .pushNamed(ForgotPasswordScreen.id);
                               },
                               child: const Text(
@@ -294,7 +294,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             style: TextStyle(color: Colors.grey[700])),
                         GestureDetector(
                           onTap: () {
-                            navigatorKey.currentState!
+                            Navigator.of(context)
                                 .pushNamed(SignUpScreen.id);
                           },
                           child: const Text(

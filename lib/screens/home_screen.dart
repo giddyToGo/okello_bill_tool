@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
         listener: (context, state) {
           final isSuccess = state.maybeWhen(
               content: (_, error, message) => true, orElse: () => false);
-          if (isSuccess) navigatorKey.currentState!.pushNamed(HomeScreen.id);
+          if (isSuccess) Navigator.of(context).pushNamed(HomeScreen.id);
         },
         child: ListView(children: <Widget>[
           Container(
@@ -261,7 +261,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   )),
                 ),
                 onPressed: () {
-                  navigatorKey.currentState!.pushNamed(UserProfileScreen.id);
+                  Navigator.of(context).pushNamed(UserProfileScreen.id);
                 },
                 child: const Padding(
                   padding: EdgeInsets.symmetric(vertical: 5),

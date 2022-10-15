@@ -35,9 +35,9 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     Timer(Duration(seconds: 3), () {
       if (isSignedIn) {
-        navigatorKey.currentState!.pushNamed(HomeScreen.id);
+        Navigator.of(context).pushNamed(HomeScreen.id);
       } else {
-        navigatorKey.currentState!.pushNamed(SignInScreen.id);
+       Navigator.of(context).pushNamed(SignInScreen.id);
       }
     });
 
@@ -51,7 +51,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   colors: [kGradient1, kGradient2])),
           child: Center(
             child:
-                Container(child: Image.asset('assets/images/splash_logo.png')),
+                Image.asset('assets/images/splash_logo.png'),
           ),
         ),
       ),

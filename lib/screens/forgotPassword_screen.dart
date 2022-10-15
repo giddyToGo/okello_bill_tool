@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:okello_bill_tool/screens/signIn_screen.dart';
 
@@ -23,10 +25,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Future<void> resetPassword() async {
+    pushToSignIn() => Navigator.of(context).pushNamed(SignInScreen.id);
     try {
       final message = await authMethods.forgottenPassword(email: email);
       snackBar(message!);
-      navigatorKey.currentState!.pushNamed(SignInScreen.id);
+      pushToSignIn();
     } on FirebaseAuthException catch (e) {
       snackBar(e.toString());
     }
@@ -137,11 +140,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                   )),
                                 ),
                                 onPressed: () async {
+                                  pop() {
+                                    log("clled a pop");
+                                    Navigator.of(context)
+                                        .pushNamed(SignInScreen.id);
+                                  }
+
                                   await context
                                       .read<AuthCubit>()
                                       .authResetPassword(email: email);
-                                  navigatorKey.currentState!
-                                      .pushNamed(SignInScreen.id);
+                                  pop();
                                 },
                                 child: const Padding(
                                   padding: EdgeInsets.symmetric(vertical: 5),
@@ -164,7 +172,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   Center(
                     child: GestureDetector(
                       onTap: () {
-                        navigatorKey.currentState!.pop();
+                        Navigator.of(context).pop();
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
