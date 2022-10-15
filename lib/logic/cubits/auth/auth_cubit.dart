@@ -9,7 +9,6 @@ import 'package:okello_bill_tool/screens/source.dart';
 
 import '../../../dialogs/auth_error.dart';
 import '../../../models/user_model.dart';
-import '../internet/internet_cubit.dart';
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState1> {
@@ -151,6 +150,7 @@ class AuthCubit extends Cubit<AuthState1> {
       {required User? user, required String provider}) async {
     Map<String, dynamic>? firestoreUser =
         await authMethods.getFireStoreUser(user?.uid);
+
     if (firestoreUser?["uid"] != null) {
       User newUser = User.fromJson(jsonEncode(firestoreUser));
       await Hive.box("users_box").put("user", newUser.toJson());
@@ -196,6 +196,7 @@ class AuthCubit extends Cubit<AuthState1> {
     emit(AuthState1.loading(state.user, null, "Signing in with Google"));
     try {
       final User? user = await authMethods.signInWithGoogle();
+      logger.wtf('user id from signinwithgoogle authcubit ${user?.uid}');
       Hive.box('users_box').put("user", user?.toJson());
 
       signInDataFlow(user: user, provider: "Google");
