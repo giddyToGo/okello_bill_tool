@@ -78,7 +78,7 @@ class _SignUpOrLoginState extends State<SignUpOrLogin> {
                             style: TextStyle(
                               fontFamily: 'Homizio',
                               fontSize: 28,
-                              color: Colors.white,
+                              color: Colors.blue,
                             )),
                       ),
                     ),
